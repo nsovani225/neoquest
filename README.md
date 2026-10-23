@@ -1,18 +1,64 @@
 # NeoQuest — React Native (Expo)
 
-React Native version of your NeoQuest screens from the Figma file
+React Native version of the NeoQuest screens from the Figma file
 [NEOQUEST-WEBAPP](https://www.figma.com/design/KQIMUbY9eN13IMvK09UH9y/NEOQUEST-WEBAPP) (Cover page).
-The Figma file was only read, never changed.
+Runs on iOS, Android and the web.
 
-## Run it
+## Getting started
 
-```bash
-npm install        # also downloads your Figma images into assets/figma/
-npx expo start     # then press w (browser), i (iOS simulator), or scan the QR code with Expo Go
-```
+You need [Node.js](https://nodejs.org) (which includes npm). Open a new Terminal window and run
+these one at a time.
 
-The app needs all 10 images in `assets/figma/` before it will start. To fetch them again:
-`npm run fetch-assets` (add `-- --force` to re-download).
+1. **Get the project.** If you have the zip, unzip it (skip this if double-clicking the zip
+   already made a `neoquest` folder in Downloads):
+
+   ```bash
+   cd ~/Downloads && unzip -o neoquest.zip
+   ```
+
+   If you're getting it from GitHub instead, clone it:
+
+   ```bash
+   git clone https://github.com/YOUR-USERNAME/neoquest.git
+   ```
+
+2. **Go into the folder:**
+
+   ```bash
+   cd ~/Downloads/neoquest
+   ```
+
+   (or `cd neoquest` if you just cloned it)
+
+3. **Install the packages and download the Figma images:**
+
+   ```bash
+   npm install
+   ```
+
+   It should end with `10/10 Figma images in assets/figma/`. You only need to do this once.
+
+4. **Start the app:**
+
+   ```bash
+   npx expo start
+   ```
+
+   When the QR code appears, press `w` to open it in your browser. To run it on your phone,
+   install **Expo Go** and scan the QR code (phone and computer on the same Wi-Fi). Press `i`
+   for the iOS simulator if Xcode is installed.
+
+To stop the app, press `Ctrl + C`. Next time, you only need steps 2 and 4.
+
+### Troubleshooting
+
+- **Expo asks to use another port:** press `Y`. Another Expo app is still running in the background.
+- **`Unable to resolve "../assets/figma/..."`:** an image didn't download. Run `npm run fetch-assets`
+  and check which file it reports. The Figma download links expire after about a week, so once
+  `assets/figma/` is filled, keep those files committed.
+- **"high severity vulnerabilities" after `npm install`:** normal for a new Expo project; they're
+  in development tools, not the app. Don't run `npm audit fix --force`, which can break Expo's
+  package versions.
 
 ## Screens and how they connect
 
@@ -38,21 +84,21 @@ the list hides its side map behind a "Map" button, and the filter categories bec
 - **Sign In / Create Account** have working fields, a show/hide password eye, and a live password
   check. There's no backend yet, so both buttons just take you to Home.
 
-## Things that differ from Figma
+## Differences from the Figma design
 
-- **"NeoQuest" title**: it's a code layer in Figma whose source I couldn't read, so it's text in
-  the Outfit Light font. Swap `font.title` in `src/theme.ts` if you know the real font.
-- **/map screen**: in Figma it's an empty embed placeholder, so the Map screen is built from the
-  map, pins and cards on your /list frame.
-- **Home embeds**: the box beside the hero headline uses the Figma placeholder image (link icon);
+- **"NeoQuest" title:** it's a code layer in Figma whose source couldn't be read, so it's text in
+  the Outfit Light font. Change `font.title` in `src/theme.ts` to use the real font.
+- **/map screen:** in Figma it's an empty embed placeholder, so the Map screen is built from the
+  map, pins and cards on the /list frame. It's a static picture, not a live map.
+- **Home embeds:** the box beside the hero headline uses the Figma placeholder image (link icon);
   the big box under "Explore the Map" shows the map picture and opens the Map screen.
-- **Filter options**: only the Activity editor is designed in Figma. The other seven categories
-  use placeholder options in `src/data.ts`; edit them there.
+- **Filter options:** only the Activity editor is designed in Figma. The other seven categories
+  use placeholder options in `src/data.ts`.
 - **"View option" on the Map** opens Google Maps directions, since there's no detail screen.
 - **"Get In Touch"** doesn't go anywhere yet (marked `TODO` in `HomeScreen.tsx`).
 - The hidden "Testimonial section" in the Home frame (1px wide in Figma) isn't included.
 
-## Structure
+## Project structure
 
 | Path | What it is |
 | --- | --- |
@@ -62,4 +108,5 @@ the list hides its side map behind a "Map" button, and the filter categories bec
 | `src/FiltersContext.tsx` | Shares applied filters between Filters, List and Map |
 | `src/components/` | Gradient text, pill button, activity card, map with pins |
 | `src/screens/` | One file per screen (Sign In and Create Account share `AuthScreens.tsx`) |
-| `scripts/fetch-assets.mjs` | Downloads the Figma images |
+| `assets/figma/` | Images exported from Figma |
+| `scripts/fetch-assets.mjs` | Downloads the Figma images (runs automatically on `npm install`) |
