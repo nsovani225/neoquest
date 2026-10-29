@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.3.0",
+    "concurrently": "^10.0.6",
     "typescript": "~6.0.3"
   },
   "scripts": {
@@ -42,7 +43,8 @@
     "fetch-assets": "node scripts/fetch-assets.mjs",
     "postinstall": "node scripts/fetch-assets.mjs",
     "typecheck": "tsc --noEmit",
-    "server": "node --env-file=.env server/index.mjs"
+    "server": "node --env-file=.env.development --env-file-if-exists=.env server/index.mjs",
+    "dev": "concurrently -n server,web -c blue,green \"npm:server\" \"npm:web\""
   },
   "private": true
 }

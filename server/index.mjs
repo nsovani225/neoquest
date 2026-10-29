@@ -5,14 +5,21 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import crypto from 'node:crypto';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 
 const CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID?.trim();
-const SECRET = process.env.SESSION_SECRET?.trim();
-const PORT = Number(process.env.PORT ?? 3001);
 const ORIGINS = (process.env.ALLOWED_ORIGINS ?? 'http://localhost:8081').split(',').map((s) => s.trim());
 const PROD = process.env.NODE_ENV === 'production';
+// Hosts like Render set PORT in production; in development PORT may belong to the web app, so use 3001.
+const PORT = Number(process.env.AUTH_PORT ?? (PROD ? process.env.PORT : undefined) ?? 3001);
+// In development a throwaway secret is fine (sessions just reset when the server restarts).
+let SECRET = process.env.SESSION_SECRET?.trim();
+if (!SECRET && !PROD) {
+  SECRET = crypto.randomBytes(32).toString('hex');
+  console.warn('SESSION_SECRET not set: using a temporary one for this run.');
+}
 const COOKIE = 'nq_session';
 const WEEK = 7 * 24 * 60 * 60;
 
