@@ -39,8 +39,9 @@ export function GoogleSignInButton({ width, onSignedIn }: { width: number; onSig
         google.accounts.id.initialize({
           client_id: GOOGLE_CLIENT_ID,
           callback: async (r: { credential: string }) => {
-            if (await cb.current.signInWithGoogle(r.credential)) cb.current.onSignedIn();
-            else setError('Sign-in failed. Is the auth server running (npm run server)?');
+            const err = await cb.current.signInWithGoogle(r.credential);
+            if (err) setError(err);
+            else cb.current.onSignedIn();
           },
         });
         google.accounts.id.renderButton(el.current, { type: 'standard', theme: 'outline', size: 'large', text: 'continue_with', shape: 'pill', width });

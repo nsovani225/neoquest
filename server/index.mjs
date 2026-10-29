@@ -47,7 +47,8 @@ app.post('/auth/google', async (req, res) => {
     const user = { id: p.sub, name: p.name ?? p.email, email: p.email, picture: p.picture };
     res.cookie(COOKIE, jwt.sign(user, SECRET, { algorithm: 'HS256', expiresIn: WEEK }), cookieOptions);
     res.json({ user });
-  } catch {
+  } catch (e) {
+    console.error('Google token verification failed:', e.message);
     res.status(401).json({ error: 'Invalid Google credential' });
   }
 });

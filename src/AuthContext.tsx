@@ -7,8 +7,8 @@ export type User = { id: string; name: string; email: string; picture?: string }
 
 type AuthValue = {
   user: User | null;
-  /** Sends the ID token Google returned to the server to be verified. Resolves true once signed in. */
-  signInWithGoogle: (credential: string) => Promise<boolean>;
+  /** Sends the ID token Google returned to the server to be verified. Resolves to an error message, or null once signed in. */
+  signInWithGoogle: (credential: string) => Promise<string | null>;
   signOut: () => void;
 };
 
@@ -32,11 +32,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signInWithGoogle = useCallback(async (credential: string) => {
     try {
       const r = await api('/auth/google', { method: 'POST', body: JSON.stringify({ credential }) });
-      if (!r.ok) return false;
+      if (!r.ok) {
+        const detail = (await r.json().catch(() => null))?.error;
+        return `The server rejected the sign-in (${r.status}${detail ? `: ${detail}` : ''}). Check the server log.`;
+      }
       setUser((await r.json()).user);
-      return true;
+      return null;
     } catch {
-      return false;
+      return `Can't reach the auth server at ${API_URL}. Is it running (npm run dev)?`;
     }
   }, []);
 
