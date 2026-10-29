@@ -1,14 +1,15 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Image } from 'expo-image';
 import { img } from '../assets';
 import { Activity, MAP_SIZE } from '../data';
+import { GoogleMap } from './GoogleMap';
 import { filters, font, list } from '../theme';
 
 /**
  * The map from your /list frame: the map image, a title chip and numbered pins.
  * Pin positions are in the 365×570 Figma coordinates and scale with the map's width.
- * It's a static picture, not a live map; swap in react-native-maps when you have real locations.
+ * On web it's a live Google Map with the same selection behaviour; native still shows the static picture.
  */
 export function ActivityMap({
   items,
@@ -31,12 +32,16 @@ export function ActivityMap({
   const sy = height / MAP_SIZE.h;
   return (
     <View style={[styles.map, { width, height }, rounded ? { borderRadius: 21, borderWidth: 1 } : null]}>
-      {/* "fill" keeps the pins lined up with the map when its shape changes. */}
-      <Image source={img.map} style={StyleSheet.absoluteFill} contentFit="fill" />
+      {Platform.OS === 'web' ? (
+        <GoogleMap items={items} selectedId={selectedId} onSelect={onSelect} infoWindow={false} />
+      ) : (
+        /* "fill" keeps the pins lined up with the map when its shape changes. */
+        <Image source={img.map} style={StyleSheet.absoluteFill} contentFit="fill" />
+      )}
       <View style={styles.titleChip}>
         <Text style={styles.titleText}>{title}</Text>
       </View>
-      {items.map((a) => {
+      {Platform.OS !== 'web' && items.map((a) => {
         const selected = a.id === selectedId;
         return (
           <Pressable

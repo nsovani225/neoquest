@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFilters } from '../FiltersContext';
 import { font, list } from '../theme';
@@ -48,8 +48,7 @@ export default function MapScreen({ navigation, route }: ScreenProps<'Map'>) {
         )}
         {current && (
           <View style={[styles.sheet, { left: wide ? 56 : 24, right: wide ? undefined : 24, width: wide ? 600 : undefined, bottom: wide ? 56 : 24 }]}>
-            {/* No detail screen exists in Figma, so "View option" opens directions in Google Maps. */}
-            <ActivityCard a={current} selected onView={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(current.name)}`)} />
+            <ActivityCard a={current} selected onView={() => navigation.navigate('Activity', { id: current.id })} />
           </View>
         )}
       </View>

@@ -50,7 +50,7 @@ export default function ListScreen({ navigation }: ScreenProps<'List'>) {
           <View style={{ flexDirection: 'row', gap: 25, marginTop: wide ? 8 : 12, alignItems: 'flex-start' }}>
             <View style={{ flex: 1, maxWidth: wide ? 754 : undefined, gap: 12 }}>
               {results.map((a) => (
-                <ActivityCard key={a.id} a={a} selected={selected === a.id} onPress={() => setSelected(a.id)} onView={() => navigation.navigate('Map', { focusId: a.id })} />
+                <ActivityCard key={a.id} a={a} selected={selected === a.id} onPress={() => setSelected(a.id)} onView={() => navigation.navigate('Activity', { id: a.id })} />
               ))}
               {results.length === 0 && (
                 <View style={styles.empty}>

@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Expo / build output
+.expo/
+dist/
+web-build/
+*.log
+
+# Secrets: copy .env.example to .env and fill in
+.env
+.env.*
+!.env.example
+
+# macOS
+.DS_Store

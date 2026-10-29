@@ -13,11 +13,13 @@ import { CrimsonText_400Regular } from '@expo-google-fonts/crimson-text';
 import { Outfit_300Light } from '@expo-google-fonts/outfit';
 
 import type { RootStack } from './src/navigation';
+import { AuthProvider } from './src/AuthContext';
 import { FiltersProvider } from './src/FiltersContext';
 import { home } from './src/theme';
 import HomeScreen from './src/screens/HomeScreen';
 import MapScreen from './src/screens/MapScreen';
 import ListScreen from './src/screens/ListScreen';
+import ActivityScreen from './src/screens/ActivityScreen';
 import FiltersScreen from './src/screens/FiltersScreen';
 import { SignInScreen, SignUpScreen } from './src/screens/AuthScreens';
 
@@ -27,7 +29,7 @@ const Stack = createNativeStackNavigator<RootStack>();
 const linking: LinkingOptions<RootStack> = {
   prefixes: [],
   config: {
-    screens: { Home: '', Map: 'map', List: 'list', Filters: 'filters', SignIn: 'signin', SignUp: 'signup' },
+    screens: { Home: '', Map: 'map', List: 'list', Activity: 'activity/:id', Filters: 'filters', SignIn: 'signin', SignUp: 'signup' },
   },
 };
 
@@ -54,6 +56,7 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
+      <AuthProvider>
       <FiltersProvider>
         <NavigationContainer linking={linking} documentTitle={{ formatter: (_, route) => (route?.name && route.name !== 'Home' ? `NeoQuest · ${route.name}` : 'NeoQuest') }}>
           <StatusBar style="auto" />
@@ -61,12 +64,14 @@ export default function App() {
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="Map" component={MapScreen} />
             <Stack.Screen name="List" component={ListScreen} />
+            <Stack.Screen name="Activity" component={ActivityScreen} />
             <Stack.Screen name="Filters" component={FiltersScreen} />
             <Stack.Screen name="SignIn" component={SignInScreen} />
             <Stack.Screen name="SignUp" component={SignUpScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </FiltersProvider>
+      </AuthProvider>
     </SafeAreaProvider>
   );
 }

@@ -6,6 +6,9 @@ import { img } from '../assets';
 import { font, home } from '../theme';
 import { MixedLine } from '../components/GradientText';
 import { Pill, useWide } from '../components/ui';
+import { GoogleMap } from '../components/GoogleMap';
+import { activities } from '../data';
+import { useAuth } from '../AuthContext';
 import type { ScreenProps } from '../navigation';
 
 const steps = [
@@ -25,6 +28,7 @@ function Divider({ source, width }: { source: number; width: number }) {
 
 export default function HomeScreen({ navigation }: ScreenProps<'Home'>) {
   const { wide, width } = useWide();
+  const { user, signOut } = useAuth();
   const scroller = useRef<React.ComponentRef<typeof ScrollView>>(null);
   const contactY = useRef(0);
   const gutter = wide ? 53 : 20;
@@ -57,7 +61,11 @@ export default function HomeScreen({ navigation }: ScreenProps<'Home'>) {
                 </Pressable>
               ))}
             </View>
-            <Pill label="Sign In" bg={home.lavender} color={home.ink} arrow={img.arrowSignIn} onPress={() => navigation.navigate('SignIn')} style={!wide && { paddingHorizontal: 16, paddingVertical: 10 }} />
+            {user ? (
+              <Pill label={`${user.name.split(' ')[0]} · Sign out`} bg={home.lavender} color={home.ink} onPress={signOut} style={!wide && { paddingHorizontal: 16, paddingVertical: 10 }} />
+            ) : (
+              <Pill label="Sign In" bg={home.lavender} color={home.ink} arrow={img.arrowSignIn} onPress={() => navigation.navigate('SignIn')} style={!wide && { paddingHorizontal: 16, paddingVertical: 10 }} />
+            )}
           </View>
 
           {/* ---- NeoQuest title ---- */}
@@ -111,16 +119,11 @@ export default function HomeScreen({ navigation }: ScreenProps<'Home'>) {
               </Text>
               <Pill label="Explore the Map" onPress={() => navigation.navigate('Map')} />
             </View>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Open the map"
-              onPress={() => navigation.navigate('Map')}
-              style={{ marginTop: 40, alignSelf: 'center', width: wide ? 980 : '100%', maxWidth: '100%' }}
-            >
+            <View style={{ marginTop: 40, alignSelf: 'center', width: wide ? 980 : '100%', maxWidth: '100%' }}>
               <Framed ratio={980 / 606}>
-                <Image source={img.map} style={StyleSheet.absoluteFill} contentFit="cover" />
+                <GoogleMap items={activities} />
               </Framed>
-            </Pressable>
+            </View>
           </View>
 
           {/* ---- How it works ---- */}

@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { img } from '../assets';
 import { auth, font } from '../theme';
 import { useWide } from '../components/ui';
+import { GoogleSignInButton } from '../components/GoogleSignInButton';
 import type { ScreenProps } from '../navigation';
 
 /** Grey top bar + card with the lavender offset shadow, shared by Sign In and Create Account. */
@@ -84,6 +85,21 @@ function PrimaryButton({ label, onPress, disabled }: { label: string; onPress: (
   );
 }
 
+/** "or" divider + Google button, shared by both screens. */
+function GoogleOption({ onSignedIn }: { onSignedIn: () => void }) {
+  const { wide } = useWide();
+  return (
+    <View style={{ marginTop: wide ? 26 : 22, gap: 16 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        <View style={styles.rule} />
+        <Text style={[styles.or, { fontSize: wide ? 20 : 16 }]}>or</Text>
+        <View style={styles.rule} />
+      </View>
+      <GoogleSignInButton width={wide ? 380 : 280} onSignedIn={onSignedIn} />
+    </View>
+  );
+}
+
 function SwitchLine({ text, link, onPress }: { text: string; link: string; onPress: () => void }) {
   const { wide } = useWide();
   return (
@@ -118,7 +134,8 @@ export function SignInScreen({ navigation }: ScreenProps<'SignIn'>) {
         {/* No backend yet: signing in just takes you to Home. */}
         <PrimaryButton label="Sign In" onPress={() => navigation.navigate('Home')} disabled={!email || !password} />
       </View>
-      <View style={{ marginTop: wide ? 63 : 32, alignItems: 'center' }}>
+      <GoogleOption onSignedIn={() => navigation.navigate('Home')} />
+      <View style={{ marginTop: wide ? 40 : 28, alignItems: 'center' }}>
         <SwitchLine text="Don’t have an account? " link="Sign up" onPress={() => navigation.replace('SignUp')} />
       </View>
     </AuthLayout>
@@ -150,6 +167,7 @@ export function SignUpScreen({ navigation }: ScreenProps<'SignUp'>) {
         {/* No backend yet: creating an account just takes you to Home. */}
         <PrimaryButton label="Create Account" onPress={() => navigation.navigate('Home')} disabled={!name || !email || !passwordOk} />
       </View>
+      <GoogleOption onSignedIn={() => navigation.navigate('Home')} />
       <View style={{ marginTop: wide ? 25 : 28, alignItems: 'center' }}>
         <SwitchLine text="Already have an account? " link="Sign in" onPress={() => navigation.replace('SignIn')} />
       </View>
@@ -171,5 +189,7 @@ const styles = StyleSheet.create({
   buttonText: { fontFamily: font.interBold, color: '#FFFFFF' },
   switch: { fontFamily: font.interBold, color: '#000000', textAlign: 'center' },
   link: { color: auth.link, textDecorationLine: 'underline' },
+  rule: { flex: 1, height: 1, backgroundColor: auth.ink, opacity: 0.25 },
+  or: { fontFamily: font.interBold, color: auth.ink },
   hint: { fontFamily: font.interBold, fontSize: 16, color: auth.ink, paddingLeft: 8 },
 });

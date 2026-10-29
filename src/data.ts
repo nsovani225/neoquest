@@ -10,13 +10,14 @@ export type Activity = {
   hours: [number, number]; // min/max duration, used by the Duration filter
   price: 'Free' | '$' | '$$' | '$$$';
   pin: { x: number; y: number };
+  coords: { lat: number; lng: number }; // real location, used by the Google Map
 };
 
 export const activities: Activity[] = [
-  { id: 1, name: 'Berkeley Marina', tags: ['Outdoor', 'Water'], miles: 2.1, rating: 4.5, vibe: 'Great for groups', durationLabel: 'Around 1–2 hours', hours: [1, 2], price: '$$', pin: { x: 127.4, y: 142.25 } },
-  { id: 2, name: 'Lake Anza', tags: ['Outdoor', 'Scenic'], miles: 4.3, rating: 4.7, vibe: 'Scenic spot', durationLabel: 'Around 2 hours', hours: [2, 2], price: 'Free', pin: { x: 254.45, y: 238.81 } },
-  { id: 3, name: 'Adventure Playground', tags: ['Adventure', 'Recreation'], miles: 2.8, rating: 4.6, vibe: 'Casual & fun', durationLabel: 'Around 1 hour', hours: [1, 1], price: 'Free', pin: { x: 167.33, y: 324.01 } },
-  { id: 4, name: 'Tilden Regional Park', tags: ['Recreation', 'Explore'], miles: 5.1, rating: 4.8, vibe: 'Lots to explore', durationLabel: '2+ hours', hours: [2, 4], price: '$', pin: { x: 290, y: 376 } },
+  { id: 1, name: 'Berkeley Marina', tags: ['Outdoor', 'Water'], miles: 2.1, rating: 4.5, vibe: 'Great for groups', durationLabel: 'Around 1–2 hours', hours: [1, 2], price: '$$', pin: { x: 127.4, y: 142.25 }, coords: { lat: 37.8693, lng: -122.3153 } },
+  { id: 2, name: 'Lake Anza', tags: ['Outdoor', 'Scenic'], miles: 4.3, rating: 4.7, vibe: 'Scenic spot', durationLabel: 'Around 2 hours', hours: [2, 2], price: 'Free', pin: { x: 254.45, y: 238.81 }, coords: { lat: 37.8975, lng: -122.2415 } },
+  { id: 3, name: 'Adventure Playground', tags: ['Adventure', 'Recreation'], miles: 2.8, rating: 4.6, vibe: 'Casual & fun', durationLabel: 'Around 1 hour', hours: [1, 1], price: 'Free', pin: { x: 167.33, y: 324.01 }, coords: { lat: 37.8728, lng: -122.3157 } },
+  { id: 4, name: 'Tilden Regional Park', tags: ['Recreation', 'Explore'], miles: 5.1, rating: 4.8, vibe: 'Lots to explore', durationLabel: '2+ hours', hours: [2, 4], price: '$', pin: { x: 290, y: 376 }, coords: { lat: 37.9056, lng: -122.254 } },
 ];
 
 export const MAP_SIZE = { w: 365, h: 570 };
