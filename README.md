@@ -1,3 +1,4 @@
+<img width="899" height="727" alt="Screenshot 2026-10-31 at 1 13 16 PM" src="https://github.com/user-attachments/assets/71ee335b-c558-4187-adf1-105ea40ba10a" />
 # 🗺️ NeoQuest
 
 > **Stop scrolling. Start exploring.**
