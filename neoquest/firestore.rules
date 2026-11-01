@@ -2,10 +2,19 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /activities/{activityId} {
-      allow read: if true;
+      allow read: if request.auth != null;
       allow create: if request.auth != null
         && request.resource.data.creatorId == request.auth.uid;
-      allow update, delete: if request.auth != null
+      allow update: if request.auth != null && (
+        resource.data.creatorId == request.auth.uid ||
+        (activityId in ['marina', 'tilden', 'adventure', 'lake-anza', 'cheese-board', 'campanile']
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'latitude', 'longitude', 'distanceMiles', 'budgetAmount',
+            'minGroupSize', 'maxGroupSize', 'durationMinutes',
+            'transportation', 'availability'
+          ]))
+      );
+      allow delete: if request.auth != null
         && resource.data.creatorId == request.auth.uid;
     }
 

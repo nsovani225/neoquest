@@ -1,5 +1,5 @@
 name: neoquest
-description: "A new Flutter project."
+description: "A map-first guide to small adventures around Berkeley."
 publish_to: 'none'
 version: 0.1.0+1
 
@@ -10,8 +10,12 @@ dependencies:
   cloud_firestore: ^7.1.0
   firebase_auth: ^7.0.1
   firebase_core: ^5.1.0
+  flutter_map: ^8.3.2
   flutter:
     sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
+  latlong2: ^0.10.1
 
 dev_dependencies:
   flutter_test:

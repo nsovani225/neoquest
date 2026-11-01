@@ -6,8 +6,13 @@ import '../data/activity_api.dart';
 import '../theme.dart';
 
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({super.key, required this.isSignUp});
+  const AuthScreen({
+    super.key,
+    required this.isSignUp,
+    this.returnTo = '/home',
+  });
   final bool isSignUp;
+  final String returnTo;
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -48,7 +53,11 @@ class _AuthScreenState extends State<AuthScreen> {
       }
       await FirestoreActivityApi().seedMissingSamples();
       if (mounted) {
-        Navigator.pushNamedAndRemoveUntil(context, '/explore', (_) => false);
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          widget.returnTo,
+          (_) => false,
+        );
       }
     } on FirebaseAuthException catch (e) {
       if (mounted) {
@@ -67,7 +76,11 @@ class _AuthScreenState extends State<AuthScreen> {
       await FirebaseAuth.instance.signInWithPopup(GoogleAuthProvider());
       await FirestoreActivityApi().seedMissingSamples();
       if (mounted) {
-        Navigator.pushNamedAndRemoveUntil(context, '/explore', (_) => false);
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          widget.returnTo,
+          (_) => false,
+        );
       }
     } on FirebaseAuthException catch (e) {
       if (mounted) {
@@ -77,6 +90,32 @@ class _AuthScreenState extends State<AuthScreen> {
       }
     } finally {
       if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _resetPassword() async {
+    final email = _email.text.trim();
+    if (!email.contains('@')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Enter your email above first.')),
+      );
+      return;
+    }
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Password reset link sent to $email.')),
+        );
+      }
+    } on FirebaseAuthException catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error.message ?? 'Could not send a reset link.'),
+          ),
+        );
+      }
     }
   }
 
@@ -125,7 +164,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           Text(
                             widget.isSignUp
                                 ? 'Start your next story.'
-                                : 'Your next story awaits.',
+                                : 'Welcome back.',
                             style: const TextStyle(
                               fontSize: 30,
                               letterSpacing: -.8,
@@ -175,6 +214,9 @@ class _AuthScreenState extends State<AuthScreen> {
                             obscureText: !_showPassword,
                             decoration: InputDecoration(
                               labelText: 'Password',
+                              helperText: widget.isSignUp
+                                  ? 'At least 8 characters, with a number'
+                                  : null,
                               prefixIcon: const Icon(
                                 Icons.lock_outline_rounded,
                               ),
@@ -189,10 +231,25 @@ class _AuthScreenState extends State<AuthScreen> {
                                 ),
                               ),
                             ),
-                            validator: (v) => v == null || v.length < 6
-                                ? 'Use at least 6 characters.'
+                            validator: (v) =>
+                                v == null ||
+                                    (widget.isSignUp
+                                        ? v.length < 8 ||
+                                              !RegExp(r'\d').hasMatch(v)
+                                        : v.length < 6)
+                                ? (widget.isSignUp
+                                      ? 'Use 8+ characters and include a number.'
+                                      : 'Enter your password.')
                                 : null,
                           ),
+                          if (!widget.isSignUp)
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: _busy ? null : _resetPassword,
+                                child: const Text('Forgot password?'),
+                              ),
+                            ),
                           const SizedBox(height: 13),
                           Row(
                             children: const [
@@ -272,7 +329,14 @@ class _AuthScreenState extends State<AuthScreen> {
                                 InkWell(
                                   onTap: () => Navigator.pushReplacementNamed(
                                     context,
-                                    widget.isSignUp ? '/signin' : '/signup',
+                                    Uri(
+                                      path: widget.isSignUp
+                                          ? '/signin'
+                                          : '/signup',
+                                      queryParameters: {
+                                        'returnTo': widget.returnTo,
+                                      },
+                                    ).toString(),
                                   ),
                                   child: Text(
                                     widget.isSignUp
@@ -298,7 +362,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [NeoColors.ink, Color(0xFF4D478E)],
+                        colors: [Color(0xFF17221B), Color(0xFF365C43)],
                       ),
                     ),
                     child: Stack(

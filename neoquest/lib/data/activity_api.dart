@@ -2,16 +2,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/activity.dart';
+import '../models/quest_filters.dart';
 
 abstract interface class ActivityApi {
   Future<List<Activity>> listActivities({
     String query = '',
     String category = 'All',
+    QuestFilters filters = const QuestFilters(),
   });
   Future<Activity?> getActivity(String id);
   Future<Activity> createActivity(Activity activity);
   Future<void> toggleSaved(String id);
   Future<Set<String>> savedIds();
+  Future<void> seedMissingSamples();
 }
 
 class FirestoreActivityApi implements ActivityApi {
@@ -24,24 +27,54 @@ class FirestoreActivityApi implements ActivityApi {
   CollectionReference<Map<String, dynamic>> get _activities =>
       _db.collection('activities');
 
+  static const _filterFields = [
+    'latitude',
+    'longitude',
+    'distanceMiles',
+    'budgetAmount',
+    'minGroupSize',
+    'maxGroupSize',
+    'durationMinutes',
+    'transportation',
+    'availability',
+  ];
+
+  @override
   Future<void> seedMissingSamples() async {
     final user = _auth.currentUser;
     if (user == null) return;
     try {
       final existing = await _activities.get();
-      final existingIds = existing.docs.map((doc) => doc.id).toSet();
+      final byId = {for (final doc in existing.docs) doc.id: doc.data()};
       final batch = _db.batch();
+      var changes = 0;
       for (final activity in seed) {
-        if (existingIds.contains(activity.id)) continue;
-        batch.set(_activities.doc(activity.id), {
-          ...activity.toJson()..remove('id'),
-          'creatorId': user.uid,
-          'createdAt': FieldValue.serverTimestamp(),
-        });
+        final ref = _activities.doc(activity.id);
+        final current = byId[activity.id];
+        final allData = activity.toJson()..remove('id');
+        if (current == null) {
+          batch.set(ref, {
+            ...allData,
+            'creatorId': user.uid,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+          changes++;
+        } else {
+          // Backfill only missing filter/map metadata. Existing descriptions,
+          // names, ratings, and other community edits remain untouched.
+          final missing = <String, dynamic>{};
+          for (final field in _filterFields) {
+            if (!current.containsKey(field)) missing[field] = allData[field];
+          }
+          if (missing.isNotEmpty) {
+            batch.set(ref, missing, SetOptions(merge: true));
+            changes++;
+          }
+        }
       }
-      await batch.commit();
+      if (changes > 0) await batch.commit();
     } on FirebaseException {
-      // Auth can be used before the Firestore database has been created.
+      // Keep authentication usable while the project owner finishes setup.
     }
   }
 
@@ -52,26 +85,44 @@ class FirestoreActivityApi implements ActivityApi {
       category: 'Outdoors',
       description:
           'Golden-hour walks, sailboats, and a wide-open view of the Bay.',
-      location: 'Berkeley Marina · 2.1 mi',
+      location: 'Berkeley Marina',
       price: r'$$',
       duration: '1–2 hours',
       rating: 4.8,
       emoji: '⛵',
       colors: [44, 124, 155, 174, 222, 221],
       imageUrl: 'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1000&q=85',
+      latitude: 37.8647,
+      longitude: -122.3149,
+      distanceMiles: 2.1,
+      budgetAmount: 20,
+      minGroupSize: 1,
+      maxGroupSize: 8,
+      durationMinutes: 100,
+      transportation: ['Walking', 'Bike', 'Public transit'],
+      availability: ['Daytime', 'Sunset', 'Anytime'],
     ),
     Activity(
       id: 'tilden',
       name: 'Tilden Regional Park',
       category: 'Nature',
       description: 'Wander shady trails and find a new favorite picnic spot.',
-      location: 'Tilden Park · 5.1 mi',
+      location: 'Tilden Park',
       price: r'$',
       duration: '2+ hours',
       rating: 4.9,
       emoji: '🌿',
       colors: [83, 135, 105, 215, 239, 192],
       imageUrl: 'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1000&q=85',
+      latitude: 37.8929,
+      longitude: -122.2447,
+      distanceMiles: 5.1,
+      budgetAmount: 10,
+      minGroupSize: 1,
+      maxGroupSize: 12,
+      durationMinutes: 150,
+      transportation: ['Car', 'Bike', 'Public transit'],
+      availability: ['Daytime', 'Anytime'],
     ),
     Activity(
       id: 'adventure',
@@ -79,13 +130,22 @@ class FirestoreActivityApi implements ActivityApi {
       category: 'Play',
       description:
           'A delightfully unusual playground built for climbing and creating.',
-      location: 'Marina Blvd · 2.8 mi',
+      location: 'Marina Boulevard',
       price: 'Free',
       duration: 'Around 1 hour',
       rating: 4.7,
       emoji: '🛝',
       colors: [239, 154, 92, 255, 224, 176],
       imageUrl: 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=1000&q=85',
+      latitude: 37.8652,
+      longitude: -122.3148,
+      distanceMiles: 2.8,
+      budgetAmount: 0,
+      minGroupSize: 1,
+      maxGroupSize: 8,
+      durationMinutes: 60,
+      transportation: ['Walking', 'Bike', 'Public transit'],
+      availability: ['Daytime', 'Anytime'],
     ),
     Activity(
       id: 'lake-anza',
@@ -93,26 +153,44 @@ class FirestoreActivityApi implements ActivityApi {
       category: 'Outdoors',
       description:
           'A quiet lake tucked into the hills. Bring a book or take a dip.',
-      location: 'Tilden Park · 4.3 mi',
+      location: 'Tilden Park',
       price: 'Free',
       duration: 'Around 2 hours',
       rating: 4.8,
       emoji: '🦆',
       colors: [71, 129, 173, 184, 224, 239],
       imageUrl: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=1000&q=85',
+      latitude: 37.8966,
+      longitude: -122.2444,
+      distanceMiles: 4.3,
+      budgetAmount: 0,
+      minGroupSize: 1,
+      maxGroupSize: 8,
+      durationMinutes: 120,
+      transportation: ['Car', 'Bike'],
+      availability: ['Daytime', 'Anytime'],
     ),
     Activity(
       id: 'cheese-board',
       name: 'The Cheese Board',
       category: 'Food & drink',
       description: 'Share a legendary slice and see what the neighborhood is lining up for.',
-      location: 'North Berkeley · 0.8 mi',
+      location: 'North Berkeley',
       price: r'$',
       duration: 'Around 1 hour',
       rating: 4.7,
       emoji: '🍕',
       colors: [225, 113, 86, 255, 221, 181],
       imageUrl: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1000&q=85',
+      latitude: 37.8791,
+      longitude: -122.2691,
+      distanceMiles: 0.8,
+      budgetAmount: 15,
+      minGroupSize: 1,
+      maxGroupSize: 8,
+      durationMinutes: 60,
+      transportation: ['Walking', 'Bike', 'Public transit'],
+      availability: ['Lunch', 'Dinner', 'Anytime'],
     ),
     Activity(
       id: 'campanile',
@@ -120,13 +198,22 @@ class FirestoreActivityApi implements ActivityApi {
       category: 'Explore',
       description:
           'Take in the campus, climb the tower, and catch the city from above.',
-      location: 'UC Berkeley · 0.4 mi',
+      location: 'UC Berkeley',
       price: r'$',
       duration: 'Around 1 hour',
       rating: 4.6,
       emoji: '🔔',
       colors: [102, 97, 177, 224, 221, 248],
       imageUrl: 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=1000&q=85',
+      latitude: 37.8722,
+      longitude: -122.2578,
+      distanceMiles: 0.4,
+      budgetAmount: 5,
+      minGroupSize: 1,
+      maxGroupSize: 6,
+      durationMinutes: 60,
+      transportation: ['Walking', 'Bike', 'Public transit'],
+      availability: ['Daytime', 'Anytime'],
     ),
   ];
 
@@ -134,30 +221,54 @@ class FirestoreActivityApi implements ActivityApi {
   Future<List<Activity>> listActivities({
     String query = '',
     String category = 'All',
+    QuestFilters filters = const QuestFilters(),
   }) async {
-    QuerySnapshot<Map<String, dynamic>> snap;
+    List<Activity> records;
     try {
-      snap = await _activities.get();
+      final snap = await _activities.get();
+      records = snap.docs.isEmpty
+          ? seed
+          : snap.docs
+                .map((doc) => Activity.fromJson({'id': doc.id, ...doc.data()}))
+                .toList();
     } on FirebaseException {
-      return seed
-          .where((item) => category == 'All' || item.category == category)
-          .toList();
+      records = seed;
     }
-    final records = snap.docs.isEmpty
-        ? seed
-        : snap.docs
-              .map((doc) => Activity.fromJson({'id': doc.id, ...doc.data()}))
-              .toList();
+    final activeCategory = category == 'All' ? filters.category : category;
     final q = query.trim().toLowerCase();
     return records.where((item) {
-      final categoryMatch = category == 'All' || item.category == category;
+      final categoryMatch =
+          activeCategory == 'All' ||
+          (activeCategory == 'Community' && item.isCommunityQuest) ||
+          item.category.toLowerCase() == activeCategory.toLowerCase() ||
+          (activeCategory == 'Outdoor' &&
+              ['outdoors', 'nature'].contains(item.category.toLowerCase())) ||
+          (activeCategory == 'Food & drinks' &&
+              item.category.toLowerCase().contains('food'));
       final queryMatch =
           q.isEmpty ||
           '${item.name} ${item.category} ${item.location} ${item.description}'
               .toLowerCase()
               .contains(q);
-      return categoryMatch && queryMatch;
-    }).toList();
+      final groupMatch =
+          item.minGroupSize <= filters.groupSize &&
+          item.maxGroupSize >= filters.groupSize;
+      final transportMatch =
+          filters.transportation.isEmpty ||
+          filters.transportation.any(item.transportation.contains);
+      final availabilityMatch =
+          filters.availability.isEmpty ||
+          filters.availability.any(item.availability.contains);
+      return categoryMatch &&
+          queryMatch &&
+          groupMatch &&
+          item.distanceMiles <= filters.maxDistance &&
+          item.budgetAmount <= filters.maxBudget &&
+          item.durationMinutes <= filters.maxDurationMinutes &&
+          item.rating >= filters.minRating &&
+          transportMatch &&
+          availabilityMatch;
+    }).toList()..sort((a, b) => a.distanceMiles.compareTo(b.distanceMiles));
   }
 
   @override
@@ -166,7 +277,7 @@ class FirestoreActivityApi implements ActivityApi {
       final doc = await _activities.doc(id).get();
       if (doc.exists) return Activity.fromJson({'id': doc.id, ...doc.data()!});
     } on FirebaseException {
-      // Show the bundled sample record while Firestore is unavailable.
+      // Display bundled samples if Firestore is temporarily unavailable.
     }
     for (final activity in seed) {
       if (activity.id == id) return activity;

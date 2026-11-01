@@ -5,11 +5,11 @@ abstract final class NeoColors {
   static const muted = Color(0xFF777B8C);
   static const paper = Color(0xFFF8F7F3);
   static const surface = Color(0xFFFFFFFF);
-  static const violet = Color(0xFF635BDB);
-  static const violetDark = Color(0xFF4843B7);
-  static const lilac = Color(0xFFEAE8FF);
+  static const violet = Color(0xFF3F7055);
+  static const violetDark = Color(0xFF284B39);
+  static const lilac = Color(0xFFE6EFE5);
   static const lime = Color(0xFFD8EF86);
-  static const line = Color(0xFFE9E8E4);
+  static const line = Color(0xFFE4E7E1);
   static const coral = Color(0xFFF18D72);
 }
 

@@ -173,7 +173,7 @@ class _Hero extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF252949), Color(0xFF3D397A)],
+          colors: [Color(0xFF17221B), Color(0xFF365C43)],
         ),
       ),
       clipBehavior: Clip.antiAlias,

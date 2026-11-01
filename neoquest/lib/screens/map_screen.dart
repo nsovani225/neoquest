@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../data/activity_api.dart';
 import '../models/activity.dart';
+import '../models/quest_filters.dart';
 import '../theme.dart';
 import '../widgets/activity_icon.dart';
 
 class MapScreen extends StatefulWidget {
-  const MapScreen({super.key, required this.api});
+  const MapScreen({super.key, required this.api, required this.filters});
   final ActivityApi api;
+  final QuestFilters filters;
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -15,11 +19,12 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   late Future<List<Activity>> _activities;
-
+  final MapController _mapController = MapController();
+  bool _mapReady = false;
   @override
   void initState() {
     super.initState();
-    _activities = widget.api.listActivities();
+    _activities = widget.api.listActivities(filters: widget.filters);
   }
 
   @override
@@ -33,217 +38,331 @@ class _MapScreenState extends State<MapScreen> {
         return const Center(child: CircularProgressIndicator());
       }
       final activities = snapshot.data!;
-      return SingleChildScrollView(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1200),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(28, 40, 28, 60),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+      final center = activities.isEmpty
+          ? const LatLng(37.8715, -122.273)
+          : LatLng(activities.first.latitude, activities.first.longitude);
+      return Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1240),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(26, 35, 26, 50),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                LayoutBuilder(
+                  builder: (context, box) {
+                    const intro = Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'BERKELEY, CA',
+                          style: TextStyle(
+                            fontSize: 10,
+                            letterSpacing: 1.5,
+                            color: NeoColors.violet,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        SizedBox(height: 9),
+                        Text(
+                          'A map full of maybes.',
+                          style: TextStyle(
+                            fontSize: 34,
+                            letterSpacing: -1,
+                            fontWeight: FontWeight.w800,
+                            color: NeoColors.ink,
+                          ),
+                        ),
+                        SizedBox(height: 6),
+                        Text(
+                          'Tap a pin, find a place, make a day of it.',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: NeoColors.muted,
+                          ),
+                        ),
+                      ],
+                    );
+                    final actions = Wrap(
+                      spacing: 8,
+                      children: [
+                        OutlinedButton.icon(
+                          onPressed: () => Navigator.pushNamed(
+                            context,
+                            Uri(
+                              path: '/list',
+                              queryParameters: widget.filters.toQuery(),
+                            ).toString(),
+                          ),
+                          icon: const Icon(Icons.view_list_rounded, size: 18),
+                          label: const Text('List view'),
+                        ),
+                        FilledButton.tonalIcon(
+                          onPressed: () => Navigator.pushNamed(
+                            context,
+                            Uri(
+                              path: '/filters',
+                              queryParameters: widget.filters.toQuery(),
+                            ).toString(),
+                          ),
+                          icon: const Icon(Icons.tune_rounded, size: 18),
+                          label: const Text('Filters'),
+                        ),
+                      ],
+                    );
+                    return box.maxWidth > 790
+                        ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              const Expanded(child: intro),
+                              const SizedBox(width: 12),
+                              actions,
+                            ],
+                          )
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              intro,
+                              const SizedBox(height: 12),
+                              actions,
+                            ],
+                          );
+                  },
+                ),
+                const SizedBox(height: 22),
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(25),
+                    child: Stack(
+                      children: [
+                        FlutterMap(
+                          mapController: _mapController,
+                          options: MapOptions(
+                            initialCenter: center,
+                            initialZoom: 12.7,
+                            minZoom: 9,
+                            maxZoom: 18,
+                            onMapReady: () {
+                              if (mounted) setState(() => _mapReady = true);
+                            },
+                          ),
                           children: [
-                            Text(
-                              'BERKELEY, CA',
-                              style: TextStyle(
-                                fontSize: 10,
-                                letterSpacing: 1.5,
-                                color: NeoColors.violet,
-                                fontWeight: FontWeight.w800,
-                              ),
+                            TileLayer(
+                              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                              userAgentPackageName: 'com.neoquest.web',
                             ),
-                            SizedBox(height: 10),
-                            Text(
-                              'The map is your menu.',
-                              style: TextStyle(
-                                fontSize: 35,
-                                letterSpacing: -1.1,
-                                fontWeight: FontWeight.w800,
-                                color: NeoColors.ink,
-                              ),
+                            MarkerLayer(
+                              markers: activities
+                                  .map(
+                                    (activity) => Marker(
+                                      point: LatLng(
+                                        activity.latitude,
+                                        activity.longitude,
+                                      ),
+                                      width: 52,
+                                      height: 58,
+                                      child: Tooltip(
+                                        message: activity.name,
+                                        child: InkWell(
+                                          onTap: () => Navigator.pushNamed(
+                                            context,
+                                            '/activity/${activity.id}',
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              Container(
+                                                width: 43,
+                                                height: 43,
+                                                decoration: BoxDecoration(
+                                                  color: NeoColors.ink,
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: Colors.white,
+                                                    width: 3,
+                                                  ),
+                                                  boxShadow: const [
+                                                    BoxShadow(
+                                                      color: Color(0x33000000),
+                                                      blurRadius: 9,
+                                                      offset: Offset(0, 4),
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: Icon(
+                                                  activityIcon(activity),
+                                                  size: 19,
+                                                  color: NeoColors.lime,
+                                                ),
+                                              ),
+                                              const Icon(
+                                                Icons.arrow_drop_down_rounded,
+                                                color: NeoColors.ink,
+                                                size: 17,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
                             ),
-                            SizedBox(height: 7),
-                            Text(
-                              'Pick a pin and see where the day takes you.',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: NeoColors.muted,
-                              ),
+                            RichAttributionWidget(
+                              attributions: [
+                                TextSourceAttribution(
+                                  'OpenStreetMap contributors',
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ),
-                      OutlinedButton.icon(
-                        onPressed: () =>
-                            Navigator.pushNamed(context, '/explore'),
-                        icon: const Icon(Icons.view_list_rounded, size: 18),
-                        label: const Text('List view'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: NeoColors.ink,
-                          side: const BorderSide(color: NeoColors.line),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 18,
-                            vertical: 15,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(13),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 25),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(25),
-                    child: SizedBox(
-                      height: 440,
-                      width: double.infinity,
-                      child: Stack(
-                        children: [
-                          const Positioned.fill(
-                            child: CustomPaint(painter: _BerkeleyMapPainter()),
-                          ),
-                          Positioned(
-                            left: 16,
-                            top: 16,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 11,
-                                vertical: 8,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: .95),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    Icons.layers_outlined,
-                                    size: 16,
-                                    color: NeoColors.violet,
-                                  ),
-                                  SizedBox(width: 7),
-                                  Text(
-                                    'SIDE QUESTS NEAR YOU',
-                                    style: TextStyle(
-                                      fontSize: 9,
-                                      letterSpacing: .7,
-                                      fontWeight: FontWeight.w800,
-                                      color: NeoColors.ink,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                        Positioned(
+                          left: 15,
+                          top: 15,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 9,
                             ),
-                          ),
-                          ...List.generate(activities.length, (index) {
-                            const points = [
-                              Offset(.24, .37),
-                              Offset(.73, .28),
-                              Offset(.48, .70),
-                              Offset(.82, .66),
-                              Offset(.12, .70),
-                              Offset(.57, .40),
-                            ];
-                            final point = points[index % points.length];
-                            final item = activities[index];
-                            return Positioned(
-                              left:
-                                  point.dx *
-                                  MediaQuery.sizeOf(context).width *
-                                  .78,
-                              top: point.dy * 440,
-                              child: Tooltip(
-                                message: item.name,
-                                child: InkWell(
-                                  onTap: () => Navigator.pushNamed(
-                                    context,
-                                    '/activity/${item.id}',
-                                  ),
-                                  borderRadius: BorderRadius.circular(30),
-                                  child: Container(
-                                    width: 46,
-                                    height: 46,
-                                    decoration: BoxDecoration(
-                                      color: NeoColors.violet,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: Colors.white,
-                                        width: 3,
-                                      ),
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color: Color(0x33000000),
-                                          blurRadius: 10,
-                                          offset: Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Icon(
-                                      activityIcon(item),
-                                      size: 20,
-                                      color: Colors.white,
-                                    ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: .96),
+                              borderRadius: BorderRadius.circular(13),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Color(0x12000000),
+                                  blurRadius: 12,
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.place_rounded,
+                                  color: NeoColors.violet,
+                                  size: 17,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  '${activities.length} nearby ideas',
+                                  style: const TextStyle(
+                                    color: NeoColors.ink,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 12,
                                   ),
                                 ),
-                              ),
-                            );
-                          }),
-                          const Positioned(
-                            right: 16,
-                            bottom: 16,
-                            child: _MapLegend(),
+                              ],
+                            ),
                           ),
-                        ],
+                        ),
+                        Positioned(
+                          right: 15,
+                          top: 15,
+                          child: Material(
+                            color: Colors.white.withValues(alpha: .96),
+                            borderRadius: BorderRadius.circular(13),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  tooltip: 'Zoom in',
+                                  onPressed: _mapReady
+                                      ? () => _mapController.move(
+                                          _mapController.camera.center,
+                                          _mapController.camera.zoom + 1,
+                                        )
+                                      : null,
+                                  icon: const Icon(Icons.add_rounded),
+                                ),
+                                const SizedBox(
+                                  width: 24,
+                                  child: Divider(height: 1),
+                                ),
+                                IconButton(
+                                  tooltip: 'Zoom out',
+                                  onPressed: _mapReady
+                                      ? () => _mapController.move(
+                                          _mapController.camera.center,
+                                          _mapController.camera.zoom - 1,
+                                        )
+                                      : null,
+                                  icon: const Icon(Icons.remove_rounded),
+                                ),
+                                const SizedBox(
+                                  width: 24,
+                                  child: Divider(height: 1),
+                                ),
+                                IconButton(
+                                  tooltip: 'Recenter on Berkeley',
+                                  onPressed: _mapReady
+                                      ? () => _mapController.move(center, 12.7)
+                                      : null,
+                                  icon: const Icon(
+                                    Icons.my_location_rounded,
+                                    size: 19,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        if (activities.isEmpty)
+                          const Center(
+                            child: Card(
+                              child: Padding(
+                                padding: EdgeInsets.all(20),
+                                child: Text(
+                                  'No quests match yet. Try widening your filters.',
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'Around you',
+                        style: TextStyle(
+                          fontSize: 19,
+                          fontWeight: FontWeight.w800,
+                          color: NeoColors.ink,
+                        ),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pushNamed(
+                        context,
+                        Uri(
+                          path: '/list',
+                          queryParameters: widget.filters.toQuery(),
+                        ).toString(),
+                      ),
+                      child: const Text('See all'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 112,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: activities.length,
+                    separatorBuilder: (_, _) => const SizedBox(width: 12),
+                    itemBuilder: (context, index) => _MapQuestCard(
+                      activity: activities[index],
+                      onTap: () => Navigator.pushNamed(
+                        context,
+                        '/activity/${activities[index].id}',
                       ),
                     ),
                   ),
-                  const SizedBox(height: 25),
-                  const Text(
-                    'Around you',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                      color: NeoColors.ink,
-                    ),
-                  ),
-                  const SizedBox(height: 13),
-                  Wrap(
-                    spacing: 9,
-                    runSpacing: 9,
-                    children: activities
-                        .map(
-                          (item) => ActionChip(
-                            avatar: Icon(
-                              activityIcon(item),
-                              color: NeoColors.violet,
-                              size: 17,
-                            ),
-                            label: Text(item.name),
-                            backgroundColor: Colors.white,
-                            side: const BorderSide(color: NeoColors.line),
-                            onPressed: () => Navigator.pushNamed(
-                              context,
-                              '/activity/${item.id}',
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                  const SizedBox(height: 14),
-                  const Text(
-                    'Illustrative map preview · connect Maps to enable live tiles and routing.',
-                    style: TextStyle(fontSize: 11, color: NeoColors.muted),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -252,114 +371,91 @@ class _MapScreenState extends State<MapScreen> {
   );
 }
 
-class _MapLegend extends StatelessWidget {
-  const _MapLegend();
+class _MapQuestCard extends StatelessWidget {
+  const _MapQuestCard({required this.activity, required this.onTap});
+  final Activity activity;
+  final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-    decoration: BoxDecoration(
-      color: Colors.white.withValues(alpha: .95),
-      borderRadius: BorderRadius.circular(12),
-    ),
-    child: const Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(Icons.circle, size: 9, color: NeoColors.violet),
-        SizedBox(width: 7),
-        Text(
-          'Side quest',
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-            color: NeoColors.ink,
+  Widget build(BuildContext context) => SizedBox(
+    width: 275,
+    child: Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(17),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(17),
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: SizedBox(
+                  width: 88,
+                  height: 88,
+                  child: activity.imageUrl == null
+                      ? ColoredBox(
+                          color: NeoColors.lilac,
+                          child: Icon(
+                            activityIcon(activity),
+                            color: NeoColors.violet,
+                          ),
+                        )
+                      : Image.network(
+                          activity.imageUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) => ColoredBox(
+                            color: NeoColors.lilac,
+                            child: Icon(
+                              activityIcon(activity),
+                              color: NeoColors.violet,
+                            ),
+                          ),
+                        ),
+                ),
+              ),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      activity.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: NeoColors.ink,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 13,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      activity.location,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: NeoColors.muted,
+                        fontSize: 11,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      '${activity.distanceMiles.toStringAsFixed(1)} mi  ·  ${activity.price}',
+                      style: const TextStyle(
+                        color: NeoColors.violet,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     ),
   );
-}
-
-class _BerkeleyMapPainter extends CustomPainter {
-  const _BerkeleyMapPainter();
-  @override
-  void paint(Canvas canvas, Size size) {
-    final base = Paint()..color = const Color(0xFFE8ECD9);
-    canvas.drawRect(Offset.zero & size, base);
-    final park = Paint()..color = const Color(0xFFC9DFC0);
-    canvas.drawPath(
-      Path()
-        ..moveTo(size.width * .55, 0)
-        ..lineTo(size.width, 0)
-        ..lineTo(size.width, size.height)
-        ..lineTo(size.width * .75, size.height * .81)
-        ..lineTo(size.width * .63, size.height * .42)
-        ..close(),
-      park,
-    );
-    final water = Paint()..color = const Color(0xFFB7D9E6);
-    canvas.drawPath(
-      Path()
-        ..moveTo(0, size.height * .70)
-        ..quadraticBezierTo(
-          size.width * .18,
-          size.height * .61,
-          size.width * .37,
-          size.height * .75,
-        )
-        ..lineTo(size.width * .39, size.height)
-        ..lineTo(0, size.height)
-        ..close(),
-      water,
-    );
-    final minor = Paint()
-      ..color = const Color(0xFFF9F8EF)
-      ..strokeWidth = 8
-      ..strokeCap = StrokeCap.round;
-    for (var row = 0; row < 8; row++) {
-      final y = size.height * (row / 7);
-      canvas.drawLine(Offset(0, y), Offset(size.width, y + 22), minor);
-    }
-    for (var col = 0; col < 12; col++) {
-      final x = size.width * (col / 11);
-      canvas.drawLine(Offset(x, 0), Offset(x - 90, size.height), minor);
-    }
-    final major = Paint()
-      ..color = const Color(0xFFFFFDF5)
-      ..strokeWidth = 14
-      ..strokeCap = StrokeCap.round;
-    canvas.drawLine(
-      Offset(size.width * .12, 0),
-      Offset(size.width * .79, size.height),
-      major,
-    );
-    canvas.drawLine(
-      Offset(size.width * .08, size.height * .18),
-      Offset(size.width, size.height * .50),
-      major,
-    );
-    final labelPaint = TextPainter(textDirection: TextDirection.ltr);
-    for (final label in const [
-      (0.29, 0.2, 'DOWNTOWN'),
-      (0.67, 0.14, 'BERKELEY HILLS'),
-      (0.78, 0.83, 'TILDEN PARK'),
-    ]) {
-      labelPaint.text = TextSpan(
-        text: label.$3,
-        style: const TextStyle(
-          fontSize: 10,
-          letterSpacing: 1.2,
-          fontWeight: FontWeight.w800,
-          color: Color(0xFF707A6E),
-        ),
-      );
-      labelPaint.layout();
-      labelPaint.paint(
-        canvas,
-        Offset(size.width * label.$1, size.height * label.$2),
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

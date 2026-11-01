@@ -3,12 +3,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../data/activity_api.dart';
 import '../models/activity.dart';
+import '../models/quest_filters.dart';
 import '../theme.dart';
 import '../widgets/activity_card.dart';
 
 class ExploreScreen extends StatefulWidget {
-  const ExploreScreen({super.key, required this.api});
+  const ExploreScreen({
+    super.key,
+    required this.api,
+    required this.initialFilters,
+  });
   final ActivityApi api;
+  final QuestFilters initialFilters;
 
   @override
   State<ExploreScreen> createState() => _ExploreScreenState();
@@ -18,6 +24,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
   final _search = TextEditingController();
   late Future<List<Activity>> _items;
   String _category = 'All';
+  late QuestFilters _filters;
   Set<String> _saved = {};
   bool _onlySaved = false;
 
@@ -34,7 +41,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
   @override
   void initState() {
     super.initState();
-    _items = widget.api.listActivities();
+    _filters = widget.initialFilters;
+    _category = _filters.category;
+    _items = widget.api.listActivities(filters: _filters);
     _loadSaved();
   }
 
@@ -49,6 +58,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
       _items = widget.api.listActivities(
         query: _search.text,
         category: _category == 'Community' ? 'All' : _category,
+        filters: _filters.copyWith(
+          category: _category == 'Community' ? 'All' : _category,
+        ),
       );
     });
   }
@@ -97,6 +109,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
     if (!mounted) return;
     setState(() {
       _category = 'All';
+      _filters = const QuestFilters();
       _search.clear();
       _onlySaved = false;
       _items = widget.api.listActivities();
@@ -116,61 +129,87 @@ class _ExploreScreenState extends State<ExploreScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'THE BERKELEY EDITION',
-                          style: TextStyle(
-                            fontSize: 10,
-                            letterSpacing: 1.5,
-                            color: NeoColors.violet,
-                            fontWeight: FontWeight.w800,
-                          ),
+              LayoutBuilder(
+                builder: (context, box) {
+                  final intro = const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'THE BERKELEY EDITION',
+                        style: TextStyle(
+                          fontSize: 10,
+                          letterSpacing: 1.5,
+                          color: NeoColors.violet,
+                          fontWeight: FontWeight.w800,
                         ),
-                        SizedBox(height: 11),
-                        Text(
-                          'Find your kind of fun.',
-                          style: TextStyle(
-                            fontSize: 37,
-                            letterSpacing: -1.3,
-                            fontWeight: FontWeight.w800,
-                            color: NeoColors.ink,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'A few good ideas, close enough to make today interesting.',
-                          style: TextStyle(
-                            fontSize: 15,
-                            color: NeoColors.muted,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  FilledButton.icon(
-                    onPressed: _createQuest,
-                    icon: const Icon(Icons.add_rounded),
-                    label: const Text('Add a side quest'),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: NeoColors.ink,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 17,
-                        vertical: 16,
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(13),
+                      SizedBox(height: 11),
+                      Text(
+                        'Find your kind of fun.',
+                        style: TextStyle(
+                          fontSize: 37,
+                          letterSpacing: -1.3,
+                          fontWeight: FontWeight.w800,
+                          color: NeoColors.ink,
+                        ),
                       ),
-                    ),
-                  ),
-                ],
+                      SizedBox(height: 8),
+                      Text(
+                        'A few good ideas, close enough to make today interesting.',
+                        style: TextStyle(fontSize: 15, color: NeoColors.muted),
+                      ),
+                    ],
+                  );
+                  final actions = Wrap(
+                    spacing: 9,
+                    runSpacing: 8,
+                    children: [
+                      FilledButton.icon(
+                        onPressed: _createQuest,
+                        icon: const Icon(Icons.add_rounded),
+                        label: const Text('Add a side quest'),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: NeoColors.ink,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 17,
+                            vertical: 16,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(13),
+                          ),
+                        ),
+                      ),
+                      OutlinedButton.icon(
+                        onPressed: () => Navigator.pushNamed(
+                          context,
+                          Uri(
+                            path: '/filters',
+                            queryParameters: _filters.toQuery(),
+                          ).toString(),
+                        ),
+                        icon: const Icon(Icons.tune_rounded, size: 17),
+                        label: const Text('Filters'),
+                      ),
+                    ],
+                  );
+                  return box.maxWidth > 760
+                      ? Row(
+                          children: [
+                            Expanded(child: intro),
+                            const SizedBox(width: 16),
+                            actions,
+                          ],
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            intro,
+                            const SizedBox(height: 15),
+                            actions,
+                          ],
+                        );
+                },
               ),
               const SizedBox(height: 27),
               Container(
@@ -235,11 +274,15 @@ class _ExploreScreenState extends State<ExploreScreen> {
                               selected: _category == category,
                               onSelected: (_) => setState(() {
                                 _category = category;
+                                _filters = _filters.copyWith(
+                                  category: category,
+                                );
                                 _items = widget.api.listActivities(
                                   query: _search.text,
                                   category: category == 'Community'
                                       ? 'All'
                                       : category,
+                                  filters: _filters,
                                 );
                               }),
                               selectedColor: NeoColors.lilac,
@@ -376,6 +419,8 @@ class _CreateQuestDialogState extends State<_CreateQuestDialog> {
   final _name = TextEditingController();
   final _description = TextEditingController();
   final _location = TextEditingController(text: 'Berkeley, CA');
+  final _latitude = TextEditingController(text: '37.8715');
+  final _longitude = TextEditingController(text: '-122.2730');
   String _category = 'Community';
   String _price = 'Free';
 
@@ -384,6 +429,8 @@ class _CreateQuestDialogState extends State<_CreateQuestDialog> {
     _name.dispose();
     _description.dispose();
     _location.dispose();
+    _latitude.dispose();
+    _longitude.dispose();
     super.dispose();
   }
 
@@ -447,6 +494,38 @@ class _CreateQuestDialogState extends State<_CreateQuestDialog> {
               Row(
                 children: [
                   Expanded(
+                    child: TextFormField(
+                      controller: _latitude,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                        signed: true,
+                      ),
+                      decoration: const InputDecoration(labelText: 'Latitude'),
+                      validator: (value) => double.tryParse(value ?? '') == null
+                          ? 'Enter a latitude.'
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: TextFormField(
+                      controller: _longitude,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                        signed: true,
+                      ),
+                      decoration: const InputDecoration(labelText: 'Longitude'),
+                      validator: (value) => double.tryParse(value ?? '') == null
+                          ? 'Enter a longitude.'
+                          : null,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
                     child: DropdownButtonFormField<String>(
                       initialValue: _category,
                       decoration: const InputDecoration(labelText: 'Category'),
@@ -505,6 +584,13 @@ class _CreateQuestDialogState extends State<_CreateQuestDialog> {
               description: _description.text.trim(),
               location: _location.text.trim(),
               price: _price,
+              latitude: double.parse(_latitude.text.trim()),
+              longitude: double.parse(_longitude.text.trim()),
+              budgetAmount: _price == 'Free'
+                  ? 0
+                  : _price == r'$'
+                  ? 12
+                  : 25,
               duration: 'Around 1 hour',
               rating: 5.0,
               emoji: '✨',
