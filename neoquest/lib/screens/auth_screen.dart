@@ -126,7 +126,7 @@ class _AuthScreenState extends State<AuthScreen> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 38),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 920),
+            constraints: const BoxConstraints(maxWidth: 1060),
             child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -356,70 +356,15 @@ class _AuthScreenState extends State<AuthScreen> {
                       ),
                     ),
                   );
-                  final art = Container(
-                    height: wide ? 560 : 215,
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [Color(0xFF17221B), Color(0xFF365C43)],
-                      ),
-                    ),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Positioned(
-                          right: -40,
-                          top: -80,
-                          child: Container(
-                            width: 230,
-                            height: 230,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white.withValues(alpha: .05),
-                            ),
-                          ),
-                        ),
-                        const Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.auto_awesome_rounded,
-                              color: NeoColors.lime,
-                              size: 31,
-                            ),
-                            SizedBox(height: 22),
-                            Text(
-                              'Your city\nis full of\nsmall wonders.',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 29,
-                                height: 1.2,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Positioned(
-                          bottom: 22,
-                          child: Text(
-                            'Find your next side quest.',
-                            style: TextStyle(
-                              color: NeoColors.lime,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                  final art = _AuthArtwork(
+                    wide: wide,
+                    isSignUp: widget.isSignUp,
                   );
                   return wide
                       ? Row(
                           children: [
+                            SizedBox(width: 385, child: art),
                             Expanded(child: form),
-                            SizedBox(width: 300, child: art),
                           ],
                         )
                       : Column(children: [art, form]);
@@ -431,4 +376,113 @@ class _AuthScreenState extends State<AuthScreen> {
       ),
     );
   }
+}
+
+class _AuthArtwork extends StatelessWidget {
+  const _AuthArtwork({required this.wide, required this.isSignUp});
+  final bool wide;
+  final bool isSignUp;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    height: wide ? 630 : 184,
+    width: double.infinity,
+    child: Stack(
+      fit: StackFit.expand,
+      children: [
+        Image.network(
+          'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1200&q=88',
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF17221B), Color(0xFF365C43)],
+              ),
+            ),
+          ),
+        ),
+        const DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0x22101A13), Color(0xDD101A13)],
+            ),
+          ),
+        ),
+        Positioned(
+          left: wide ? 28 : 19,
+          top: wide ? 28 : 16,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: .28),
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(color: Colors.white.withValues(alpha: .28)),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.explore_outlined, color: NeoColors.lime, size: 15),
+                SizedBox(width: 7),
+                Text(
+                  'NEOQUEST  ·  BERKELEY',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 9,
+                    letterSpacing: 1,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Positioned(
+          left: wide ? 32 : 20,
+          right: wide ? 32 : 20,
+          bottom: wide ? 37 : 17,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                isSignUp
+                    ? Icons.auto_awesome_rounded
+                    : Icons.wb_twilight_rounded,
+                color: NeoColors.lime,
+                size: wide ? 27 : 20,
+              ),
+              SizedBox(height: wide ? 18 : 7),
+              Text(
+                isSignUp
+                    ? 'Make room for\na little wonder.'
+                    : 'Your city is full\nof small wonders.',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: wide ? 39 : 24,
+                  height: 1.03,
+                  letterSpacing: wide ? -1.3 : -.5,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              if (wide) ...[
+                const SizedBox(height: 14),
+                const Text(
+                  'Small plans. Good stories. Right around the corner.',
+                  style: TextStyle(
+                    color: Color(0xFFE0E8DF),
+                    fontSize: 13,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
 }

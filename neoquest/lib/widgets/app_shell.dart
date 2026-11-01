@@ -4,15 +4,16 @@ import 'package:flutter/material.dart';
 import '../theme.dart';
 
 class AppShell extends StatelessWidget {
-  const AppShell({super.key, required this.child});
+  const AppShell({super.key, required this.child, this.showAuthActions = true});
   final Widget child;
+  final bool showAuthActions;
 
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: NeoColors.paper,
     body: Column(
       children: [
-        const _TopBar(),
+        _TopBar(showAuthActions: showAuthActions),
         Expanded(child: child),
       ],
     ),
@@ -20,7 +21,8 @@ class AppShell extends StatelessWidget {
 }
 
 class _TopBar extends StatelessWidget {
-  const _TopBar();
+  const _TopBar({required this.showAuthActions});
+  final bool showAuthActions;
 
   Future<void> _signOut(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
@@ -121,7 +123,7 @@ class _TopBar extends StatelessWidget {
                       ),
                     ),
                   )
-                else ...[
+                else if (showAuthActions) ...[
                   OutlinedButton(
                     onPressed: () => Navigator.pushNamed(context, '/signin'),
                     child: const Text('Sign in'),
@@ -134,7 +136,19 @@ class _TopBar extends StatelessWidget {
                     ),
                     child: const Text('Get started'),
                   ),
-                ],
+                ] else
+                  TextButton.icon(
+                    onPressed: () => Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/',
+                      (_) => false,
+                    ),
+                    icon: const Icon(Icons.arrow_back_rounded, size: 16),
+                    label: const Text('Back to site'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: NeoColors.muted,
+                    ),
+                  ),
               ],
             ),
           ),

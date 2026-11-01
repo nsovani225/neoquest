@@ -50,13 +50,17 @@ class _NeoQuestAppState extends State<NeoQuestApp> {
 
     if (protected && FirebaseAuth.instance.currentUser == null) {
       final target = '$normalized${uri.hasQuery ? '?${uri.query}' : ''}';
-      return AppShell(child: AuthScreen(isSignUp: false, returnTo: target));
+      return AppShell(
+        showAuthActions: false,
+        child: AuthScreen(isSignUp: false, returnTo: target),
+      );
     }
     final filters = QuestFilters.fromQuery(query);
     if (normalized == '/') return const LandingScreen();
     if (normalized == '/signin' || normalized == '/signup') {
       final returnTo = query['returnTo'] ?? '/home';
       return AppShell(
+        showAuthActions: false,
         child: AuthScreen(
           isSignUp: normalized == '/signup',
           returnTo: returnTo,

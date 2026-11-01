@@ -246,90 +246,203 @@ class _QuestVisual extends StatelessWidget {
   const _QuestVisual();
   @override
   Widget build(BuildContext context) => AspectRatio(
-    aspectRatio: 1.03,
+    aspectRatio: .92,
     child: Stack(
+      clipBehavior: Clip.none,
       children: [
         Positioned.fill(
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: const Color(0xFF1C2821),
-              borderRadius: BorderRadius.circular(34),
-              border: Border.all(color: Colors.white.withValues(alpha: .08)),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(34),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.network(
+                  'https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=1200&q=90',
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [Color(0xFF314D38), Color(0xFF17221B)],
+                          ),
+                        ),
+                      ),
+                ),
+                const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0x22101815),
+                        Color(0x99101815),
+                        Color(0xEE101815),
+                      ],
+                      stops: [0, .52, 1],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 24,
+                  left: 24,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 9,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xCC101815),
+                      borderRadius: BorderRadius.circular(30),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: .2),
+                      ),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.explore_outlined,
+                          color: NeoColors.lime,
+                          size: 15,
+                        ),
+                        SizedBox(width: 7),
+                        Text(
+                          'YOUR NEXT SIDE QUEST',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            letterSpacing: 1,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: 23,
+                  top: 23,
+                  child: Container(
+                    padding: const EdgeInsets.all(11),
+                    decoration: BoxDecoration(
+                      color: NeoColors.lime,
+                      borderRadius: BorderRadius.circular(17),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 20,
+                          offset: Offset(0, 7),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.near_me_rounded,
+                      color: Color(0xFF182017),
+                      size: 20,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  left: 27,
+                  right: 27,
+                  bottom: 145,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'BERKELEY, CALIFORNIA',
+                        style: TextStyle(
+                          color: NeoColors.lime,
+                          letterSpacing: 1.8,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 9),
+                      Text(
+                        'Take the\nscenic route.',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: MediaQuery.sizeOf(context).width < 500
+                              ? 35
+                              : 48,
+                          height: .99,
+                          letterSpacing: -1.8,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            child: CustomPaint(painter: _QuestMapPainter()),
           ),
-        ),
-        const Positioned(
-          left: 22,
-          top: 20,
-          child: _MapTag(
-            icon: Icons.explore_outlined,
-            label: 'YOUR NEXT SIDE QUEST',
-          ),
-        ),
-        const Positioned(
-          right: 16,
-          top: 65,
-          child: _Pin(icon: Icons.local_cafe_rounded, tint: Color(0xFFE6A788)),
-        ),
-        const Positioned(
-          left: 50,
-          top: 112,
-          child: _Pin(icon: Icons.park_rounded, tint: NeoColors.lime),
-        ),
-        const Positioned(
-          right: 95,
-          top: 168,
-          child: _Pin(icon: Icons.music_note_rounded, tint: Color(0xFFC1B8FF)),
-        ),
-        const Positioned(
-          left: 145,
-          bottom: 120,
-          child: _Pin(icon: Icons.restaurant_rounded, tint: Color(0xFFE6A788)),
         ),
         Positioned(
           left: 18,
           bottom: 18,
           right: 18,
           child: Container(
-            padding: const EdgeInsets.all(15),
+            padding: const EdgeInsets.all(13),
             decoration: BoxDecoration(
-              color: const Color(0xFF111A15).withValues(alpha: .96),
+              color: const Color(0xFFFBF8F0),
               borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: Colors.white.withValues(alpha: .1)),
-            ),
-            child: const Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: Color(0xFF344A37),
-                  child: Icon(Icons.wb_twilight_rounded, color: NeoColors.lime),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 25,
+                  offset: Offset(0, 9),
                 ),
-                SizedBox(width: 12),
-                Expanded(
+              ],
+            ),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: Image.network(
+                    'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=240&q=80',
+                    width: 56,
+                    height: 56,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      width: 56,
+                      height: 56,
+                      color: const Color(0xFFDCE7D8),
+                      child: const Icon(
+                        Icons.wb_twilight_rounded,
+                        color: Color(0xFF456A48),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'A slower kind of evening',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Color(0xFF1D2820),
                           fontWeight: FontWeight.w800,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      SizedBox(height: 5),
                       Text(
-                        'A sunset walk by the water · easy · free',
+                        'Sunset by the water  ·  easy  ·  free',
                         style: TextStyle(
-                          color: Color(0xFFA8B5AA),
+                          color: Color(0xFF66736A),
                           fontSize: 11,
                         ),
                       ),
                     ],
                   ),
                 ),
-                Icon(
+                const Icon(
                   Icons.arrow_outward_rounded,
-                  color: NeoColors.lime,
+                  color: Color(0xFF1D2820),
                   size: 18,
                 ),
               ],
@@ -339,83 +452,6 @@ class _QuestVisual extends StatelessWidget {
       ],
     ),
   );
-}
-
-class _QuestMapPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final pathPaint = Paint()
-      ..color = const Color(0xFF334437)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-    for (var i = 0; i < 6; i++) {
-      final y = size.height * (.22 + i * .12);
-      canvas.drawPath(
-        Path()
-          ..moveTo(0, y)
-          ..cubicTo(
-            size.width * .25,
-            y - 40,
-            size.width * .58,
-            y + 45,
-            size.width,
-            y - 10,
-          ),
-        pathPaint,
-      );
-    }
-    for (var i = 0; i < 5; i++) {
-      final x = size.width * (.1 + i * .2);
-      canvas.drawPath(
-        Path()
-          ..moveTo(x, 0)
-          ..cubicTo(
-            x - 40,
-            size.height * .35,
-            x + 60,
-            size.height * .6,
-            x + 10,
-            size.height,
-          ),
-        pathPaint,
-      );
-    }
-    final route = Paint()
-      ..color = NeoColors.lime.withValues(alpha: .72)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.5
-      ..strokeCap = StrokeCap.round;
-    canvas.drawPath(
-      Path()
-        ..moveTo(size.width * .2, size.height * .45)
-        ..cubicTo(
-          size.width * .39,
-          size.height * .23,
-          size.width * .5,
-          size.height * .73,
-          size.width * .76,
-          size.height * .42,
-        ),
-      route,
-    );
-    final dots = Paint()..color = const Color(0xFF56705A);
-    for (final dot in [
-      (0.13, .28),
-      (.82, .25),
-      (.65, .61),
-      (.28, .77),
-      (.9, .75),
-    ]) {
-      canvas.drawCircle(
-        Offset(size.width * dot.$1, size.height * dot.$2),
-        18,
-        dots..color = const Color(0xFF34483A),
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _ExploreSection extends StatelessWidget {
@@ -563,16 +599,33 @@ class _LandingFooter extends StatelessWidget {
     child: ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 1200),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 25),
-        child: Row(
-          children: [
-            const _Wordmark(),
-            const Spacer(),
-            const Text(
-              'Make today a little less ordinary.',
-              style: TextStyle(color: Color(0xFF86948A), fontSize: 12),
-            ),
-          ],
+        padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.sizeOf(context).width < 500 ? 20 : 30,
+          vertical: 25,
+        ),
+        child: LayoutBuilder(
+          builder: (context, box) => box.maxWidth > 460
+              ? const Row(
+                  children: [
+                    _Wordmark(),
+                    Spacer(),
+                    Text(
+                      'Make today a little less ordinary.',
+                      style: TextStyle(color: Color(0xFF86948A), fontSize: 12),
+                    ),
+                  ],
+                )
+              : const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _Wordmark(),
+                    SizedBox(height: 14),
+                    Text(
+                      'Make today a little less ordinary.',
+                      style: TextStyle(color: Color(0xFF86948A), fontSize: 12),
+                    ),
+                  ],
+                ),
         ),
       ),
     ),
@@ -653,56 +706,5 @@ class _Promise extends StatelessWidget {
         ),
       ),
     ],
-  );
-}
-
-class _MapTag extends StatelessWidget {
-  const _MapTag({required this.icon, required this.label});
-  final IconData icon;
-  final String label;
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
-    decoration: BoxDecoration(
-      color: const Color(0xFF0F1712).withValues(alpha: .9),
-      borderRadius: BorderRadius.circular(30),
-      border: Border.all(color: Colors.white.withValues(alpha: .08)),
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: NeoColors.lime, size: 15),
-        const SizedBox(width: 7),
-        Text(
-          label,
-          style: const TextStyle(
-            color: Colors.white,
-            letterSpacing: .8,
-            fontWeight: FontWeight.w800,
-            fontSize: 9,
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-class _Pin extends StatelessWidget {
-  const _Pin({required this.icon, required this.tint});
-  final IconData icon;
-  final Color tint;
-  @override
-  Widget build(BuildContext context) => Container(
-    width: 44,
-    height: 44,
-    decoration: BoxDecoration(
-      color: const Color(0xFF111A15),
-      shape: BoxShape.circle,
-      border: Border.all(color: tint, width: 2),
-      boxShadow: const [
-        BoxShadow(color: Colors.black38, blurRadius: 18, offset: Offset(0, 5)),
-      ],
-    ),
-    child: Icon(icon, color: tint, size: 20),
   );
 }
