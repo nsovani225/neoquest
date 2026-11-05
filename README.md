@@ -1,257 +1,207 @@
 # 🗺️ NeoQuest
 
-> **Stop scrolling. Start exploring.**
+**Stop scrolling. Start exploring.**
 
-NeoQuest is a hangout discovery platform that helps friends find things to do nearby based on what they actually want to do.
+NeoQuest is a hangout discovery platform that helps friends find things to do nearby based on their interests, budget, and availability.
 
-Instead of recommending only major attractions or the same highly rated destinations, NeoQuest focuses on spontaneous **side quests**: grabbing boba, finding a sunset spot, exploring a new neighborhood, playing basketball, studying at a café, or discovering something completely unexpected.
+Whether it's grabbing boba, finding a basketball court, exploring a new neighborhood, or discovering a hidden spot around town, NeoQuest makes it easier to turn an ordinary day into a side quest.
 
-Users tell NeoQuest their group's preferences and constraints, and NeoQuest turns nearby places and activities into personalized recommendations displayed through an interactive map.
+Instead of focusing only on popular attractions, we're building a way to discover everyday experiences that are affordable, accessible, and actually interesting to your group.
+
+> 🚧 **Project Status:** NeoQuest is currently under active development. Features and technologies described below may change as the project progresses.
 
 ---
 
 ## ✨ What is NeoQuest?
 
-Ever had this conversation?
+We've all had the same conversation:
 
 > "What do you want to do?"
-> "I don't know. What do *you* want to do?"
-> "I don't know."
+>
+> "I don't know. What do you want to do?"
+>
+> "I don't know either."
 
-NeoQuest is designed to solve that problem.
+NeoQuest is our attempt to make that conversation a little shorter.
 
-Users can create a hangout based on factors such as:
+Users can discover activities based on a few simple preferences:
 
-* 💰 Budget
-* 👥 Group size
-* 🎯 Activity preferences
-* 🚗 Transportation
-* ⏰ Available time
-* 📍 Location
+- **Budget** — How much are you willing to spend?
+- **Group Size** — Going solo or with friends?
+- **Activity** — Food, sports, outdoors, exploring, or something else?
+- **Transportation** — Walking, biking, public transit, or driving?
+- **Time** — How long do you have?
+- **Location** — How far are you willing to go?
 
-NeoQuest then searches nearby activities and locations and surfaces options that fit the group.
+NeoQuest uses these preferences to help users find nearby places and activities that fit their plans.
 
-Rather than asking:
-
-> **"What are the most popular things near me?"**
-
-NeoQuest asks:
-
-> **"What would actually be fun for this group right now?"**
+Our goal isn't necessarily to recommend the most popular place in town. It's to help people find something worth doing, even in places they think they already know.
 
 ---
 
-## 🌟 Core Features
+## 🌟 Features
 
 ### 🧭 Side Quest Discovery
 
-Discover nearby activities based on your group's preferences instead of endlessly searching Google Maps, Yelp, Reddit, or social media.
+Find activities beyond the usual tourist attractions and popular destinations.
 
-Possible side quests could include:
+A side quest could be anything from trying a new café to taking a random bus route and exploring an unfamiliar neighborhood.
 
-* trying a new boba shop
-* finding a basketball court
-* exploring a park
-* visiting a café
-* finding a sunset viewpoint
-* taking transit somewhere unfamiliar
-* finding a cheap restaurant
-* discovering an activity suggested by another NeoQuest user
+NeoQuest aims to combine location-based recommendations with creative activities suggested by the community.
 
----
+### 🔥 Activity Heatmap (Planned)
 
-### 🔥 Activity Heatmap
+One of our main ideas is an interactive heatmap that highlights areas based on the activity users want to do.
 
-Instead of displaying every nearby location equally, NeoQuest aims to visualize **where the best areas are for a particular activity**.
+For example, selecting **"Get Drinks"** could highlight areas with concentrations of boba shops, cafés, smoothie shops, and dessert spots.
 
-For example, if the group selects:
+Switching to **"Something Active"** could instead highlight parks, basketball courts, hiking trails, and recreation centers.
 
-**🧋 "Get drinks"**
-
-areas containing strong clusters of:
-
-* boba shops
-* cafés
-* smoothie shops
-* dessert spots
-
-could become more prominent on the map.
-
-If the group switches to:
-
-**🏀 "Do something active"**
-
-the visualization could instead emphasize:
-
-* basketball courts
-* parks
-* recreation centers
-* hiking areas
-* sports facilities
-
-The goal is to turn the map into a visual representation of **where the action is** for the group's current mood.
-
----
+Rather than displaying dozens of unrelated map pins, the heatmap would help users see which areas are most promising for their plans.
 
 ### 🎛️ Preference-Based Filtering
 
-Users can narrow recommendations according to constraints such as:
+Recommendations can be narrowed using different constraints.
 
-| Preference     | Example                                   |
-| -------------- | ----------------------------------------- |
-| Budget         | Free, $, $$                               |
-| Group Size     | Solo, 2–4, 5+                             |
-| Transportation | Walking, biking, transit, driving         |
-| Activity       | Food, outdoors, sports, drinks, exploring |
-| Time           | 30 min, 1 hr, 2+ hrs                      |
-| Distance       | Nearby or willing to travel               |
+| Preference | Example |
+|---|---|
+| Budget | Free, $, $$ |
+| Group Size | Solo, 2–4, 5+ |
+| Transportation | Walking, biking, transit, driving |
+| Activity | Food, outdoors, sports, drinks, exploring |
+| Time | 30 minutes, 1 hour, 2+ hours |
+| Distance | Nearby or willing to travel |
 
-These preferences are used to rank or filter potential side quests.
-
----
-
-### 👥 Group Preferences
-
-Hangouts involve more than one person.
-
-NeoQuest aims to combine preferences from multiple people to find activities that work for the entire group rather than optimizing for a single user.
-
-Future versions may allow friends to submit their preferences independently through an invitation link.
-
----
+These filters will help users find activities that work for their group rather than sorting through unrelated recommendations.
 
 ### 🗺️ Interactive Map
 
-Recommendations appear directly on an interactive map.
+NeoQuest is designed around a map-based interface where users can explore nearby places, compare locations, and discover potential side quests.
 
-Users will be able to:
+Planned functionality includes:
 
-* explore nearby recommendations
-* inspect individual locations
-* view activity categories
-* compare areas
-* visualize activity density
-* select a side quest
-* bookmark places for later
+- Viewing nearby activities and destinations
+- Filtering locations by activity type
+- Exploring individual place details
+- Visualizing activity density
+- Selecting and bookmarking places
 
----
+### 👥 Group Preferences
+
+Planning a hangout means considering what everyone wants to do.
+
+NeoQuest aims to support shared preferences so that suggestions work for the group as a whole.
+
+Future versions may allow friends to submit preferences individually or save recurring group preferences.
 
 ### ➕ Community Side Quests
 
-Not every fun activity exists in a places database.
+Not every fun activity needs to come from a business listing.
 
-NeoQuest users can submit their own side quest ideas for other users to discover.
+We want users to eventually submit their own side quests for others to discover.
 
-Examples might include:
+For example:
 
 > "Take the 51B five random stops and explore wherever you end up."
 
-or
+Or:
 
-> "Grab drinks here and walk to this sunset spot."
+> "Grab drinks at a new café and find somewhere nearby to watch the sunset."
 
-This community layer helps NeoQuest recommend experiences rather than only businesses.
+Community-created activities would help NeoQuest recommend experiences, not just places.
 
 ---
 
 ## 🧠 How NeoQuest Works
 
+The planned user flow is straightforward:
+
 ```text
-                    ┌─────────────────┐
-                    │      User       │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │ Create Hangout  │
-                    │ + Preferences   │
-                    └────────┬────────┘
-                             │
-                             ▼
-                 ┌───────────────────────┐
-                 │ Recommendation Engine │
-                 │                       │
-                 │ Budget • Group Size   │
-                 │ Distance • Activity   │
-                 │ Time • Transportation │
-                 └───────────┬───────────┘
-                             │
-                    ┌────────┴────────┐
-                    │                 │
-                    ▼                 ▼
-              ┌──────────┐      ┌──────────┐
-              │ Places / │      │ NeoQuest │
-              │ Map APIs │      │ Database │
-              └─────┬────┘      └─────┬────┘
-                    │                 │
-                    └────────┬────────┘
-                             ▼
-                    ┌─────────────────┐
-                    │ Ranked Results  │
-                    └────────┬────────┘
-                             ▼
-                    ┌─────────────────┐
-                    │ Map + Heatmap   │
-                    └────────┬────────┘
-                             ▼
-                    ┌─────────────────┐
-                    │   SIDE QUEST!   │
-                    └─────────────────┘
+Open NeoQuest
+      |
+      v
+Create a Hangout
+      |
+      v
+Enter Group Preferences
+      |
+      v
+Find Nearby Places & Activities
+      |
+      v
+Filter and Rank Recommendations
+      |
+      v
+Explore Results on the Map
+      |
+      v
+Choose a Side Quest!
 ```
+
+For example, suppose four friends want to get drinks, have a budget of $15 each, and don't want to drive.
+
+NeoQuest could search for nearby cafés, boba shops, and dessert spots, filter the options according to their constraints, and display suitable locations on the map.
+
+As the recommendation system develops, we also hope to incorporate community suggestions and activity-based heatmaps.
 
 ---
 
 ## 🛠️ Tech Stack
 
-### Frontend
+NeoQuest's technology stack is evolving as the team builds and tests different components.
 
-* **React / Next.js** — web application and component architecture
-* **JavaScript / TypeScript** — frontend logic
-* **CSS** — styling and responsive design
-* **Figma** — UI/UX design and prototyping
+| Technology | Purpose |
+|---|---|
+| **Flutter / Dart** | Application development for the current Flutter branch |
+| **Firebase Authentication** | User registration and login |
+| **Cloud Firestore** | Storing user data, preferences, bookmarks, and side quests |
+| **Figma** | Interface design and prototyping |
+| **Google Maps Platform** | Planned map and location functionality |
+| **Google Places API** | Potential source for nearby place information |
+| **Python / scikit-learn** | Potential recommendation and data-processing tools |
+| **Git / GitHub** | Version control and collaboration |
 
-### Backend & Database
+Flutter is used in the current application branch. Firebase and external API integrations should be configured and verified as development progresses.
 
-* **Firebase Authentication** — account creation and login
-* **Cloud Firestore** — users, preferences, bookmarks, side quests, and other application data
-* **Firebase Storage** — potential storage for user-uploaded images
-* **Firebase Cloud Functions / Next.js API Routes** — server-side logic where necessary
+### Database & Authentication
 
-### Maps & Location Data
+Firebase is our intended solution for managing user accounts and application data.
 
-Potential integrations include:
+The planned database will support information such as:
 
-* **Google Maps Platform**
-* **Google Places API**
-* **Google Routes API**
+- User profiles and preferences
+- Saved locations and bookmarks
+- Community-created side quests
+- Hangout history
+- Group preferences
 
-These services can provide geographic search, place information, travel distance, and map visualization.
+Firebase Authentication will handle user sign-in, while Cloud Firestore will store application data.
 
-Additional APIs/data sources are still being evaluated.
+### Maps & APIs
 
-### Data & Recommendation System
+We're evaluating APIs that can provide:
 
-Potential tools include:
+- Nearby businesses and attractions
+- Location coordinates
+- Place categories and ratings
+- Travel distance and estimated travel time
+- Map visualization
 
-* Python
-* pandas
-* NumPy
-* scikit-learn
+Google Maps Platform and Google Places are leading candidates.
 
-Early versions of NeoQuest may rely primarily on rule-based filtering and ranking before introducing more sophisticated recommendation methods.
+API selection will also depend on usage limits, cost, and restrictions on storing or displaying third-party data.
 
 ---
 
-## 🗃️ Proposed Data Model
+## 🗃️ Proposed Database Structure
 
-A simplified Firebase structure could look like:
+A simplified Firestore structure might look like:
 
 ```text
 users/
   {userId}/
     displayName
     preferences
-    savedPlaces
     savedFriends
 
 sideQuests/
@@ -264,7 +214,6 @@ sideQuests/
     budget
     duration
     groupSize
-    likes
 
 hangouts/
   {hangoutId}/
@@ -280,213 +229,176 @@ bookmarks/
     createdAt
 ```
 
-The exact schema will evolve as features are implemented.
-
----
-
-## 🗺️ Recommendation Pipeline
-
-A NeoQuest search could roughly follow:
-
-```text
-User Preferences
-       ↓
-Retrieve Nearby Places
-       ↓
-Filter Invalid Options
-       ↓
- ┌─────┴─────┐
- ↓           ↓
-Budget     Distance
- ↓           ↓
-Group      Activity
-Size       Match
- └─────┬─────┘
-       ↓
-Score Candidates
-       ↓
-Rank Side Quests
-       ↓
-Map Visualization
-       ↓
-Activity Heatmap
-```
-
-For example:
-
-```text
-Activity: Drinks
-Budget: $
-Group Size: 4
-Transportation: Walking
-Distance: < 2 miles
-```
-
-NeoQuest might retrieve nearby cafés, boba shops, juice bars, and dessert shops, filter them according to the constraints, rank the remaining options, and visualize promising areas on the map.
-
----
-
-## 🔌 API Strategy
-
-We are currently evaluating the best APIs for NeoQuest.
-
-The ideal combination should provide:
-
-| Need                   | Potential Solution                    |
-| ---------------------- | ------------------------------------- |
-| Interactive map        | Google Maps JavaScript API            |
-| Nearby places          | Google Places API                     |
-| Place categories       | Google Places API                     |
-| Ratings/reviews        | Places data / other permitted sources |
-| Distance & travel time | Google Routes API                     |
-| User authentication    | Firebase Authentication               |
-| Application database   | Cloud Firestore                       |
-| User images            | Firebase Storage                      |
-| Weather-aware quests   | Weather API                           |
-| Community quests       | NeoQuest / Firestore                  |
-
-One important development goal is minimizing dependence on unnecessary APIs and keeping API usage within reasonable quotas and costs.
+This is a proposed structure, not a finalized schema. Collections and fields may change as the database team implements the application.
 
 ---
 
 ## 🎨 Design
 
-NeoQuest's interface is designed in **Figma** before implementation.
+We're using Figma to plan NeoQuest's interface before implementing new features.
 
 Our design priorities are:
 
-* map-first exploration
-* minimal friction between opening NeoQuest and finding an activity
-* intuitive preference selection
-* visually distinct activity categories
-* mobile-friendly layouts
-* playful "side quest" aesthetics
+- A map-first exploration experience
+- Simple and intuitive filtering
+- Clear activity categories
+- Mobile-friendly layouts
+- A playful interface that fits the side quest concept
 
-Figma mockups and screenshots will be added here as designs are finalized.
-
-<!-- Add Figma screenshots here -->
-
----
-
-## 📁 Proposed Project Structure
-
-```text
-neoquest/
-│
-├── app/
-│   ├── login/
-│   ├── dashboard/
-│   ├── explore/
-│   └── quest/
-│
-├── components/
-│   ├── Map/
-│   ├── Heatmap/
-│   ├── Filters/
-│   ├── QuestCard/
-│   └── Navbar/
-│
-├── lib/
-│   ├── firebase/
-│   ├── maps/
-│   └── recommendations/
-│
-├── public/
-│
-├── styles/
-│
-├── docs/
-│   └── designs/
-│
-├── .env.example
-├── package.json
-└── README.md
-```
-
-This structure is provisional and may change as development progresses.
+Screenshots and Figma previews will be added as designs are finalized.
 
 ---
 
 ## 🚀 Getting Started
 
-### 1. Clone the repository
+Follow these steps to set up and run the Flutter version of NeoQuest locally.
+
+### Prerequisites
+
+Before starting, make sure you have:
+
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) installed
+- [Git](https://git-scm.com/) installed
+- An editor such as VS Code or Android Studio
+- Access to the NeoQuest GitHub repository
+
+To verify your Flutter installation, open a terminal and run:
+
+```bash
+flutter doctor
+```
+
+This checks whether Flutter is installed correctly and identifies missing development tools.
+
+Resolve any relevant setup issues before continuing.
+
+### 1. Clone the Repository
+
+Clone NeoQuest onto your computer:
 
 ```bash
 git clone <repository-url>
+```
+
+Navigate into the project directory:
+
+```bash
 cd neoquest
 ```
 
-### 2. Install dependencies
+If you're working on a specific branch, switch to that branch before proceeding.
+
+Make sure you're inside the Flutter project folder containing `pubspec.yaml`.
+
+### 2. Install Dependencies
+
+Run:
 
 ```bash
-npm install
+flutter pub get
 ```
 
-### 3. Configure environment variables
+This downloads the packages listed in the project's `pubspec.yaml` file.
 
-Create a `.env.local` file.
+You should run this command when setting up the project for the first time or whenever dependencies are added or updated.
 
-```env
-NEXT_PUBLIC_FIREBASE_API_KEY=
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+### 3. Run the Application
 
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=
-```
-
-**Never commit API keys or secrets to GitHub.**
-
-A `.env.example` file should contain the required variable names without real credentials.
-
-### 4. Start the development server
+Once dependencies are installed, run:
 
 ```bash
-npm run dev
+flutter run
 ```
 
-Then open the local development URL shown in your terminal.
+Flutter may display a list of available devices.
+
+For example:
+
+```text
+Connected devices:
+
+[1]: Chrome (chrome)
+[2]: macOS (macos)
+
+Please choose one:
+```
+
+**If Chrome is listed as option 1, type `1` and press Enter.**
+
+This launches NeoQuest in Chrome.
+
+The device numbers may differ depending on your computer, so choose the number corresponding to the device you want to use.
+
+### Quick Start
+
+After completing the initial setup, the typical commands are:
+
+```bash
+flutter pub get
+flutter run
+```
+
+Then select the appropriate device when prompted.
+
+**Note:** You generally don't need to run `flutter pub get` every time. Once dependencies are installed, you can usually start the application with `flutter run`.
+
+### Troubleshooting
+
+**Flutter command not found**
+
+Check that the Flutter SDK is installed and added to your system's PATH.
+
+**No devices available**
+
+Run:
+
+```bash
+flutter devices
+```
+
+This lists the devices Flutter can currently detect.
+
+**Dependencies aren't installing**
+
+Make sure you're in the folder containing `pubspec.yaml`, then try:
+
+```bash
+flutter pub get
+```
+
+**Chrome doesn't appear**
+
+Check your Flutter web configuration and verify that Chrome is installed. If web support is available, you can also try:
+
+```bash
+flutter run -d chrome
+```
+
+**Firebase or API configuration errors**
+
+Some functionality may require Firebase configuration files or API credentials. Contact the relevant team member for the current development setup.
+
+Do not commit private credentials, service account keys, or other secrets to the repository.
 
 ---
 
-## 👨‍💻 Team Structure
+## 📁 Project Structure
 
-NeoQuest development is divided into three primary subteams:
+Flutter projects generally follow a structure similar to:
 
-### 🎨 Frontend
+```text
+neoquest/
+├── android/             # Android configuration
+├── ios/                 # iOS configuration
+├── lib/                 # Main Dart application code
+│   └── main.dart        # Application entry point
+├── web/                 # Web configuration
+├── test/                # Application tests
+├── pubspec.yaml         # Dependencies and project settings
+└── README.md
+```
 
-Responsible for:
-
-* Figma designs
-* page layouts
-* components
-* map interface
-* filtering interface
-* responsive design
-
-### 🔐 Database & Authentication
-
-Responsible for:
-
-* Firebase setup
-* authentication
-* Firestore schema
-* user profiles
-* saved preferences
-* bookmarks
-* user-created side quests
-
-### 📊 Data & APIs
-
-Responsible for:
-
-* places APIs
-* location data
-* recommendation logic
-* filtering/ranking
-* heatmap data
-* API integration and preprocessing
-
-All three teams collaborate on integration and testing.
+The actual NeoQuest directory structure may differ. Additional folders for authentication, database services, maps, and UI components will be documented as they are implemented.
 
 ---
 
@@ -494,57 +406,70 @@ All three teams collaborate on integration and testing.
 
 ### Phase 1 — Foundation
 
-* [ ] Finalize Figma designs
-* [ ] Set up Next.js project
-* [ ] Configure Firebase
-* [ ] Configure Maps/Places APIs
-* [ ] Establish Git/GitHub workflow
+- [ ] Finalize initial Figma designs
+- [ ] Set up and verify the Flutter application
+- [ ] Configure Firebase Authentication
+- [ ] Design the initial Firestore schema
+- [ ] Evaluate Maps and Places APIs
 
-### Phase 2 — MVP
+### Phase 2 — Core MVP
 
-* [ ] User authentication
-* [ ] Dashboard
-* [ ] Interactive map
-* [ ] Nearby place retrieval
-* [ ] Preference filters
-* [ ] Basic recommendation ranking
-* [ ] Side quest cards
+- [ ] User registration and login
+- [ ] Basic dashboard and navigation
+- [ ] Interactive map
+- [ ] Nearby place retrieval
+- [ ] Preference filtering
+- [ ] Basic recommendation logic
+- [ ] Side quest selection
 
-### Phase 3 — NeoQuest Features
+### Phase 3 — Additional Features
 
-* [ ] Activity heatmap
-* [ ] User-created side quests
-* [ ] Bookmarks
-* [ ] Saved group preferences
-* [ ] Improved recommendation scoring
+- [ ] Activity heatmap
+- [ ] Community-created side quests
+- [ ] Bookmarks and saved locations
+- [ ] Saved group preferences
+- [ ] Improved recommendation ranking
 
-### Phase 4 — Stretch Features
+### Phase 4 — Stretch Goals
 
-* [ ] Friend preference invitations
-* [ ] Reviews / voting
-* [ ] Weather-aware recommendations
-* [ ] Community popularity signals
-* [ ] Photos
-* [ ] More sophisticated recommendation model
-* [ ] Expansion beyond the initial Berkeley/Bay Area testing region
+- [ ] Shared preference invitations
+- [ ] User reviews and ratings
+- [ ] Weather-aware recommendations
+- [ ] User-uploaded photos
+- [ ] More advanced recommendation models
+- [ ] Expansion beyond Berkeley and the Bay Area
+
+Checkboxes will be updated as features are completed and integrated.
 
 ---
 
-## 🎯 MVP Goal
+## 👨‍💻 Team Structure
 
-Our MVP should allow a user to:
+NeoQuest development is organized into three main subteams.
 
-**Sign in → create a hangout → enter preferences → receive nearby recommendations → explore them on a map → choose a side quest.**
+### Frontend
 
-Everything else builds on this core experience.
+Responsible for designing and implementing the user-facing application.
+
+This includes Figma designs, Flutter screens, navigation, filters, map interfaces, and reusable components.
+
+### Database & Authentication
+
+Responsible for Firebase integration, authentication, user profiles, preferences, bookmarks, and stored side quests.
+
+### Data & APIs
+
+Responsible for evaluating external APIs, retrieving place data, developing filtering and recommendation logic, and exploring heatmap visualization.
+
+The subteams collaborate on integration, debugging, and testing.
 
 ---
 
 ## 🤝 Contributing
 
-### Branch Workflow
+We're building NeoQuest collaboratively, so please work on separate branches rather than pushing unfinished changes directly to `main`.
 
-Create a branch for the feature you are working on:
+### 1. Create a Branch
 
 ```bash
 git checkout -b feature/your-feature-name
@@ -554,45 +479,68 @@ Examples:
 
 ```text
 feature/firebase-auth
+feature/flutter-dashboard
 feature/google-maps
 feature/activity-heatmap
 feature/quest-filtering
-feature/dashboard-ui
 ```
 
-Commit your changes:
+### 2. Make Your Changes
+
+Implement and test your feature locally.
+
+For Flutter code, you can run:
+
+```bash
+flutter analyze
+```
+
+This checks your Dart code for common issues.
+
+### 3. Commit Your Changes
 
 ```bash
 git add .
-git commit -m "Add Firebase authentication"
+git commit -m "Add feature description"
 ```
 
-Push your branch:
+Use descriptive commit messages so other members can understand what changed.
+
+### 4. Push Your Branch
 
 ```bash
 git push origin feature/your-feature-name
 ```
 
-Then create a Pull Request for review.
+### 5. Open a Pull Request
 
-Please avoid pushing unfinished feature work directly to `main`.
+Create a pull request on GitHub and describe:
+
+- What you changed
+- Why the change was needed
+- How you tested it
+- Any remaining issues
+
+Have another team member review your changes before merging.
 
 ---
 
 ## 📌 Project Status
 
-🚧 **NeoQuest is currently under active development.**
+NeoQuest is currently being developed and tested by our team.
 
-The architecture, APIs, database schema, recommendation logic, and interface may change as we test different approaches.
+Our immediate goal is a working application where users can enter hangout preferences, discover nearby activities, and explore recommendations through a map.
+
+The recommendation system, database schema, API integrations, and additional social features will continue to evolve.
 
 ---
 
-## 🌎 Our Goal
+## 🌎 Why NeoQuest?
 
-NeoQuest isn't trying to tell you what the most famous thing in your city is.
+We don't think every hangout needs to involve a famous destination, an expensive activity, or hours of planning.
 
-It's trying to answer a much simpler question:
+Sometimes it's enough to find a new café, explore a neighborhood, or try something you wouldn't have considered otherwise.
 
-> **What should we do right now?**
+NeoQuest is about making those small adventures easier to discover.
 
-Find your next side quest.
+**Find your next side quest.**
