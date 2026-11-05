@@ -9,7 +9,7 @@ class AuthScreen extends StatefulWidget {
   const AuthScreen({
     super.key,
     required this.isSignUp,
-    this.returnTo = '/home',
+    this.returnTo = '/profile',
   });
   final bool isSignUp;
   final String returnTo;

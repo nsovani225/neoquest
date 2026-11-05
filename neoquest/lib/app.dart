@@ -12,6 +12,7 @@ import 'screens/landing_screen.dart';
 import 'screens/map_screen.dart';
 import 'theme.dart';
 import 'widgets/app_shell.dart';
+import 'screens/profile_screen.dart';
 
 class NeoQuestApp extends StatefulWidget {
   const NeoQuestApp({super.key});
@@ -42,6 +43,7 @@ class _NeoQuestAppState extends State<NeoQuestApp> {
     final query = uri.queryParameters;
     final protected =
         normalized == '/home' ||
+        normalized == '/profile' ||
         normalized == '/filters' ||
         normalized == '/list' ||
         normalized == '/explore' ||
@@ -58,7 +60,7 @@ class _NeoQuestAppState extends State<NeoQuestApp> {
     final filters = QuestFilters.fromQuery(query);
     if (normalized == '/') return const LandingScreen();
     if (normalized == '/signin' || normalized == '/signup') {
-      final returnTo = query['returnTo'] ?? '/home';
+      final returnTo = query['returnTo'] ?? '/profile';
       return AppShell(
         showAuthActions: false,
         child: AuthScreen(
@@ -66,6 +68,9 @@ class _NeoQuestAppState extends State<NeoQuestApp> {
           returnTo: returnTo,
         ),
       );
+    }
+    if (normalized == '/profile') {
+      return AppShell(child: const ProfileScreen());
     }
     if (normalized == '/home') return AppShell(child: HomeScreen(api: api));
     if (normalized == '/filters') {

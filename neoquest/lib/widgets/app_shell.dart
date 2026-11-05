@@ -93,7 +93,7 @@ class _TopBar extends StatelessWidget {
                     tooltip: 'Account menu',
                     onSelected: (value) => value == 'signout'
                         ? _signOut(context)
-                        : Navigator.pushNamed(context, '/home'),
+                        : Navigator.pushNamed(context, '/profile'),
                     itemBuilder: (_) => const [
                       PopupMenuItem(value: 'account', child: Text('Account')),
                       PopupMenuItem(value: 'signout', child: Text('Sign out')),
