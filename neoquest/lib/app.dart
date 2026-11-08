@@ -60,7 +60,9 @@ class _NeoQuestAppState extends State<NeoQuestApp> {
       );
     }
     if (normalized == '/profile') {
-      return AppShell(child: ProfileScreen(api: api));
+      return AppShell(
+        child: ProfileScreen(api: api, promptSetup: query['setup'] == '1'),
+      );
     }
     if (normalized == '/home') return AppShell(child: HomeScreen(api: api));
     if (normalized == '/filters') {

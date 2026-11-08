@@ -358,8 +358,14 @@ class FirestoreActivityApi implements ActivityApi {
   Future<Set<String>> visitedIds() async {
     final user = _auth.currentUser;
     if (user == null) return <String>{};
-    final snap = await _hangouts(user.uid).get();
-    return snap.docs.map((doc) => doc.id).toSet();
+    try {
+      final snap = await _hangouts(user.uid).get();
+      return snap.docs.map((doc) => doc.id).toSet();
+    } on FirebaseException {
+      // Keep browsing available if visit history is temporarily unavailable
+      // or the updated Firestore rules have not been deployed yet.
+      return <String>{};
+    }
   }
 
   @override

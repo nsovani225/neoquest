@@ -169,7 +169,7 @@ class _MapScreenState extends State<MapScreen> {
                                         activity.longitude,
                                       ),
                                       width: 52,
-                                      height: 58,
+                                      height: 62,
                                       child: Tooltip(
                                         message: activity.name,
                                         child: InkWell(
