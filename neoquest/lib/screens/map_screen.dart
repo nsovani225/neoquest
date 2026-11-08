@@ -27,6 +27,15 @@ class _MapScreenState extends State<MapScreen> {
     _activities = widget.api.listActivities(filters: widget.filters);
   }
 
+  Future<void> _openActivity(String id) async {
+    await Navigator.pushNamed(context, '/activity/$id');
+    if (mounted) {
+      setState(() {
+        _activities = widget.api.listActivities(filters: widget.filters);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) => FutureBuilder<List<Activity>>(
     future: _activities,
@@ -164,10 +173,8 @@ class _MapScreenState extends State<MapScreen> {
                                       child: Tooltip(
                                         message: activity.name,
                                         child: InkWell(
-                                          onTap: () => Navigator.pushNamed(
-                                            context,
-                                            '/activity/${activity.id}',
-                                          ),
+                                          onTap: () =>
+                                              _openActivity(activity.id),
                                           child: Column(
                                             children: [
                                               Container(
@@ -355,10 +362,7 @@ class _MapScreenState extends State<MapScreen> {
                     separatorBuilder: (_, _) => const SizedBox(width: 12),
                     itemBuilder: (context, index) => _MapQuestCard(
                       activity: activities[index],
-                      onTap: () => Navigator.pushNamed(
-                        context,
-                        '/activity/${activities[index].id}',
-                      ),
+                      onTap: () => _openActivity(activities[index].id),
                     ),
                   ),
                 ),

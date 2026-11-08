@@ -65,6 +65,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
     });
   }
 
+  Future<void> _openActivity(String id) async {
+    await Navigator.pushNamed(context, '/activity/$id');
+    if (mounted) _refresh();
+  }
+
   Future<void> _loadSaved() async {
     final ids = await widget.api.savedIds();
     if (mounted) setState(() => _saved = ids);
@@ -405,10 +410,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                             activity: item,
                             isSaved: _saved.contains(item.id),
                             onSave: () => _toggleSaved(item.id),
-                            onTap: () => Navigator.pushNamed(
-                              context,
-                              '/activity/${item.id}',
-                            ),
+                            onTap: () => _openActivity(item.id),
                           );
                         },
                       );

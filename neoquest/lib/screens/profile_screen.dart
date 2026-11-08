@@ -3,30 +3,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../data/activity_api.dart';
 import '../theme.dart';
 
-/// Saves a hangout for the signed-in user. Call this when a quest is started.
-Future<void> recordHangout({
-  required String activityId,
-  required String activityName,
-  String category = '',
-}) async {
-  final u = FirebaseAuth.instance.currentUser;
-  if (u == null) return;
-  await FirebaseFirestore.instance
-      .collection('users')
-      .doc(u.uid)
-      .collection('hangouts')
-      .add({
-    'activityId': activityId,
-    'activityName': activityName,
-    'category': category,
-    'date': FieldValue.serverTimestamp(),
-  });
-}
-
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({super.key, required this.api});
+  final ActivityApi api;
 
   @override
   Widget build(BuildContext context) {
@@ -39,13 +21,14 @@ class ProfileScreen extends StatelessWidget {
         ),
       );
     }
-    return _ProfileBody(user: user);
+    return _ProfileBody(user: user, api: api);
   }
 }
 
 class _ProfileBody extends StatelessWidget {
-  const _ProfileBody({required this.user});
+  const _ProfileBody({required this.user, required this.api});
   final User user;
+  final ActivityApi api;
 
   DocumentReference<Map<String, dynamic>> get _doc =>
       FirebaseFirestore.instance.collection('users').doc(user.uid);
@@ -162,9 +145,9 @@ class _ProfileBody extends StatelessWidget {
             },
           )),
 
-          // ── Past hangouts ──
+          // ── My quests ──
           _card(Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Text('Past hangouts',
+            const Text('My quests',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
             const SizedBox(height: 12),
             StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
@@ -174,7 +157,7 @@ class _ProfileBody extends StatelessWidget {
                   .snapshots(),
               builder: (context, snap) {
                 if (snap.hasError) {
-                  return Text('Couldn’t load hangouts: ${snap.error}');
+                  return Text('Couldn’t load your quests: ${snap.error}');
                 }
                 if (!snap.hasData) {
                   return const Padding(
@@ -185,7 +168,7 @@ class _ProfileBody extends StatelessWidget {
                 final docs = snap.data!.docs;
                 if (docs.isEmpty) {
                   return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const Text('No hangouts yet. Start a quest to see it here.',
+                    const Text('Quests you\'ve been on will appear here.',
                         style: TextStyle(color: NeoColors.muted)),
                     TextButton(
                         onPressed: () => Navigator.pushNamed(context, '/explore'),
@@ -201,9 +184,43 @@ class _ProfileBody extends StatelessWidget {
                           child: Icon(Icons.place, color: NeoColors.ink, size: 18)),
                       title: Text((h.data()['activityName'] as String?) ?? 'Quest'),
                       subtitle: Text((h.data()['category'] as String?) ?? ''),
-                      trailing: Text(_fmt(h.data()['date'] as Timestamp?),
-                          style: const TextStyle(
-                              color: NeoColors.muted, fontSize: 12)),
+                      onTap: () => Navigator.pushNamed(
+                        context,
+                        '/activity/${h.id}',
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(_fmt(h.data()['date'] as Timestamp?),
+                              style: const TextStyle(
+                                  color: NeoColors.muted, fontSize: 12)),
+                          IconButton(
+                            tooltip: 'Remove from My quests',
+                            onPressed: () async {
+                              try {
+                                await api.unmarkVisited(h.id);
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Removed from My quests.'),
+                                    ),
+                                  );
+                                }
+                              } on FirebaseException catch (error) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(error.message ??
+                                          'Could not update your quest history.'),
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                            icon: const Icon(Icons.undo_rounded),
+                          ),
+                        ],
+                      ),
                     ),
                 ]);
               },

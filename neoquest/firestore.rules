@@ -22,5 +22,13 @@ service cloud.firestore {
       allow read, write: if request.auth != null
         && request.auth.uid == userId;
     }
+
+    match /users/{userId}/hangouts/{activityId} {
+      allow read, delete: if request.auth != null
+        && request.auth.uid == userId;
+      allow create: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.activityId == activityId;
+    }
   }
 }

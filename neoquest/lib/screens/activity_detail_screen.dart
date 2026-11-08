@@ -22,17 +22,60 @@ class ActivityDetailScreen extends StatefulWidget {
 class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
   late Future<Activity?> _activity;
   bool _saved = false;
+  bool _visited = false;
+  bool _visiting = false;
 
   @override
   void initState() {
     super.initState();
     _activity = widget.api.getActivity(widget.activityId);
     _loadSaved();
+    _loadVisited();
   }
 
   Future<void> _loadSaved() async {
     final ids = await widget.api.savedIds();
     if (mounted) setState(() => _saved = ids.contains(widget.activityId));
+  }
+
+  Future<void> _loadVisited() async {
+    final ids = await widget.api.visitedIds();
+    if (mounted) setState(() => _visited = ids.contains(widget.activityId));
+  }
+
+  Future<void> _markVisited(Activity activity) async {
+    if (FirebaseAuth.instance.currentUser == null) {
+      final returnTo = Uri(
+        path: '/signin',
+        queryParameters: {'returnTo': '/activity/${activity.id}'},
+      );
+      Navigator.pushNamed(context, returnTo.toString());
+      return;
+    }
+    setState(() => _visiting = true);
+    try {
+      await widget.api.markVisited(activity);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Added to My quests.')));
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop(true);
+      } else {
+        setState(() => _visited = true);
+      }
+    } on FirebaseException catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              error.message ?? 'Could not update your quest history.',
+            ),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _visiting = false);
+    }
   }
 
   @override
@@ -258,6 +301,38 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
                                   ),
                                 ),
                               ),
+                            ),
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              width: double.infinity,
+                              child: _visited
+                                  ? FilledButton.tonalIcon(
+                                      onPressed: null,
+                                      icon: const Icon(Icons.check_rounded),
+                                      label: const Text('Already in My quests'),
+                                    )
+                                  : FilledButton.icon(
+                                      onPressed: _visiting
+                                          ? null
+                                          : () => _markVisited(activity),
+                                      icon: _visiting
+                                          ? const SizedBox(
+                                              width: 18,
+                                              height: 18,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                              ),
+                                            )
+                                          : const Icon(Icons.done_all_rounded),
+                                      label: const Text('Mark as visited'),
+                                      style: FilledButton.styleFrom(
+                                        backgroundColor: NeoColors.ink,
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 16,
+                                        ),
+                                      ),
+                                    ),
                             ),
                             const SizedBox(height: 10),
                             SizedBox(

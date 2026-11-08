@@ -1,8 +1,15 @@
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/activity.dart';
 import '../models/quest_filters.dart';
+
+@visibleForTesting
+List<Activity> filterUnvisitedActivities(
+  Iterable<Activity> activities,
+  Set<String> visitedIds,
+) => activities.where((activity) => !visitedIds.contains(activity.id)).toList();
 
 abstract interface class ActivityApi {
   Future<List<Activity>> listActivities({
@@ -14,6 +21,9 @@ abstract interface class ActivityApi {
   Future<Activity> createActivity(Activity activity);
   Future<void> toggleSaved(String id);
   Future<Set<String>> savedIds();
+  Future<Set<String>> visitedIds();
+  Future<void> markVisited(Activity activity);
+  Future<void> unmarkVisited(String id);
   Future<void> seedMissingSamples();
 }
 
@@ -236,7 +246,8 @@ class FirestoreActivityApi implements ActivityApi {
     }
     final activeCategory = category == 'All' ? filters.category : category;
     final q = query.trim().toLowerCase();
-    return records.where((item) {
+    final visited = await visitedIds();
+    final matching = records.where((item) {
       final categoryMatch =
           activeCategory == 'All' ||
           (activeCategory == 'Community' && item.isCommunityQuest) ||
@@ -268,7 +279,9 @@ class FirestoreActivityApi implements ActivityApi {
           item.rating >= filters.minRating &&
           transportMatch &&
           availabilityMatch;
-    }).toList()..sort((a, b) => a.distanceMiles.compareTo(b.distanceMiles));
+    });
+    return filterUnvisitedActivities(matching, visited)
+      ..sort((a, b) => a.distanceMiles.compareTo(b.distanceMiles));
   }
 
   @override
@@ -336,5 +349,50 @@ class FirestoreActivityApi implements ActivityApi {
     } on FirebaseException {
       return <String>{};
     }
+  }
+
+  CollectionReference<Map<String, dynamic>> _hangouts(String uid) =>
+      _db.collection('users').doc(uid).collection('hangouts');
+
+  @override
+  Future<Set<String>> visitedIds() async {
+    final user = _auth.currentUser;
+    if (user == null) return <String>{};
+    final snap = await _hangouts(user.uid).get();
+    return snap.docs.map((doc) => doc.id).toSet();
+  }
+
+  @override
+  Future<void> markVisited(Activity activity) async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw FirebaseAuthException(
+        code: 'unauthenticated',
+        message: 'Sign in to add a quest to your history.',
+      );
+    }
+    final ref = _hangouts(user.uid).doc(activity.id);
+    await _db.runTransaction((transaction) async {
+      final existing = await transaction.get(ref);
+      if (existing.exists) return;
+      transaction.set(ref, {
+        'activityId': activity.id,
+        'activityName': activity.name,
+        'category': activity.category,
+        'date': FieldValue.serverTimestamp(),
+      });
+    });
+  }
+
+  @override
+  Future<void> unmarkVisited(String id) async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw FirebaseAuthException(
+        code: 'unauthenticated',
+        message: 'Sign in to update your quest history.',
+      );
+    }
+    await _hangouts(user.uid).doc(id).delete();
   }
 }
