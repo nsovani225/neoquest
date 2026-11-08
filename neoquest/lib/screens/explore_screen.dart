@@ -71,6 +71,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
   }
 
   Future<void> _toggleSaved(String id) async {
+    if (FirebaseAuth.instance.currentUser == null) {
+      Navigator.pushNamed(context, '/signin?returnTo=/list');
+      return;
+    }
     try {
       await widget.api.toggleSaved(id);
       await _loadSaved();
@@ -87,6 +91,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
   }
 
   Future<void> _createQuest() async {
+    if (FirebaseAuth.instance.currentUser == null) {
+      Navigator.pushNamed(context, '/signin?returnTo=/list');
+      return;
+    }
     final activity = await showDialog<Activity>(
       context: context,
       builder: (_) => const _CreateQuestDialog(),
@@ -239,8 +247,16 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         ),
                         const SizedBox(width: 9),
                         OutlinedButton.icon(
-                          onPressed: () =>
-                              setState(() => _onlySaved = !_onlySaved),
+                          onPressed: () {
+                            if (FirebaseAuth.instance.currentUser == null) {
+                              Navigator.pushNamed(
+                                context,
+                                '/signin?returnTo=/list',
+                              );
+                              return;
+                            }
+                            setState(() => _onlySaved = !_onlySaved);
+                          },
                           icon: Icon(
                             _onlySaved
                                 ? Icons.favorite_rounded

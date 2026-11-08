@@ -264,6 +264,14 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
                               width: double.infinity,
                               child: OutlinedButton.icon(
                                 onPressed: () async {
+                                  if (FirebaseAuth.instance.currentUser ==
+                                      null) {
+                                    Navigator.pushNamed(
+                                      context,
+                                      '/signin?returnTo=/activity/${activity.id}',
+                                    );
+                                    return;
+                                  }
                                   try {
                                     await widget.api.toggleSaved(activity.id);
                                     await _loadSaved();

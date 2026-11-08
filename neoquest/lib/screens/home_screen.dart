@@ -34,6 +34,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _toggleSaved(String id) async {
+    if (FirebaseAuth.instance.currentUser == null) {
+      Navigator.pushNamed(context, '/signin?returnTo=/home');
+      return;
+    }
     try {
       await widget.api.toggleSaved(id);
       await _loadSaved();
