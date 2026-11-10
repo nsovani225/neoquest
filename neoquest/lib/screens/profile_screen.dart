@@ -8,6 +8,7 @@ import '../data/activity_api.dart';
 import '../models/activity.dart';
 import '../models/quest_filters.dart';
 import '../theme.dart';
+import '../widgets/slider_value_input.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key, required this.api, this.promptSetup = false});
@@ -892,11 +893,28 @@ class _PreferencesPanelState extends State<_PreferencesPanel> {
               onChanged: (value) =>
                   _update(_filters.copyWith(maxDistance: value)),
             ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                'Up to ${_filters.maxDistance.toStringAsFixed(1)} miles',
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Up to ${_filters.maxDistance.toStringAsFixed(1)} miles',
+                  ),
+                ),
+                const Text(
+                  'Custom',
+                  style: TextStyle(color: NeoColors.muted, fontSize: 12),
+                ),
+                const SizedBox(width: 8),
+                SliderValueInput(
+                  value: _filters.maxDistance,
+                  min: .5,
+                  max: 100,
+                  decimalPlaces: 1,
+                  suffix: 'mi',
+                  onChanged: (value) =>
+                      _update(_filters.copyWith(maxDistance: value)),
+                ),
+              ],
             ),
           ],
         ),
@@ -917,13 +935,29 @@ class _PreferencesPanelState extends State<_PreferencesPanel> {
               onChanged: (value) =>
                   _update(_filters.copyWith(maxBudget: value.round())),
             ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                _filters.maxBudget == 0
-                    ? 'Free quests'
-                    : 'Up to \$${_filters.maxBudget}',
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    _filters.maxBudget == 0
+                        ? 'Free quests'
+                        : 'Up to \$${_filters.maxBudget}',
+                  ),
+                ),
+                const Text(
+                  'Custom',
+                  style: TextStyle(color: NeoColors.muted, fontSize: 12),
+                ),
+                const SizedBox(width: 8),
+                SliderValueInput(
+                  value: _filters.maxBudget.toDouble(),
+                  min: 0,
+                  max: 100,
+                  prefix: '\$',
+                  onChanged: (value) =>
+                      _update(_filters.copyWith(maxBudget: value.round())),
+                ),
+              ],
             ),
           ],
         ),
@@ -995,13 +1029,30 @@ class _PreferencesPanelState extends State<_PreferencesPanel> {
               onChanged: (value) =>
                   _update(_filters.copyWith(minRating: value)),
             ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                _filters.minRating == 0
-                    ? 'Any rating'
-                    : '${_filters.minRating.toStringAsFixed(1)} stars or higher',
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    _filters.minRating == 0
+                        ? 'Any rating'
+                        : '${_filters.minRating.toStringAsFixed(1)} stars or higher',
+                  ),
+                ),
+                const Text(
+                  'Custom',
+                  style: TextStyle(color: NeoColors.muted, fontSize: 12),
+                ),
+                const SizedBox(width: 8),
+                SliderValueInput(
+                  value: _filters.minRating,
+                  min: 0,
+                  max: 5,
+                  decimalPlaces: 1,
+                  suffix: '★',
+                  onChanged: (value) =>
+                      _update(_filters.copyWith(minRating: value)),
+                ),
+              ],
             ),
           ],
         ),
