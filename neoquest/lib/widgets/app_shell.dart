@@ -70,7 +70,7 @@ class _TopBar extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                if (signedIn && MediaQuery.sizeOf(context).width > 590) ...[
+                if (MediaQuery.sizeOf(context).width > 590) ...[
                   _NavLink(
                     label: 'Home',
                     active: ModalRoute.of(context)?.settings.name == '/home',

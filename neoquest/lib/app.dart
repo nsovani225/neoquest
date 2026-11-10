@@ -41,20 +41,10 @@ class _NeoQuestAppState extends State<NeoQuestApp> {
     final uri = Uri.tryParse(path) ?? Uri(path: '/');
     final normalized = uri.path.isEmpty ? '/' : uri.path;
     final query = uri.queryParameters;
-    final protected =
-        normalized == '/home' ||
-        normalized == '/profile' ||
-        normalized == '/filters' ||
-        normalized == '/list' ||
-        normalized == '/explore' ||
-        normalized == '/map' ||
-        normalized.startsWith('/activity/');
-
-    if (protected && FirebaseAuth.instance.currentUser == null) {
-      final target = '$normalized${uri.hasQuery ? '?${uri.query}' : ''}';
+    if (normalized == '/profile' && FirebaseAuth.instance.currentUser == null) {
       return AppShell(
         showAuthActions: false,
-        child: AuthScreen(isSignUp: false, returnTo: target),
+        child: const AuthScreen(isSignUp: false, returnTo: '/profile'),
       );
     }
     final filters = QuestFilters.fromQuery(query);
@@ -70,7 +60,9 @@ class _NeoQuestAppState extends State<NeoQuestApp> {
       );
     }
     if (normalized == '/profile') {
-      return AppShell(child: const ProfileScreen());
+      return AppShell(
+        child: ProfileScreen(api: api, promptSetup: query['setup'] == '1'),
+      );
     }
     if (normalized == '/home') return AppShell(child: HomeScreen(api: api));
     if (normalized == '/filters') {

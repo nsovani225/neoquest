@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/quest_filters.dart';
 import '../theme.dart';
+import '../widgets/slider_value_input.dart';
 
 class FiltersScreen extends StatefulWidget {
   const FiltersScreen({super.key, required this.filters});
@@ -115,10 +116,10 @@ class _FiltersScreenState extends State<FiltersScreen> {
                           child: Column(
                             children: [
                               Slider(
-                                value: _filters.maxDistance.clamp(0.5, 10),
+                                value: _filters.maxDistance.clamp(0.5, 100),
                                 min: .5,
-                                max: 10,
-                                divisions: 19,
+                                max: 100,
+                                divisions: 199,
                                 label:
                                     '${_filters.maxDistance.toStringAsFixed(1)} mi',
                                 onChanged: (value) => setState(
@@ -128,18 +129,34 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                 ),
                               ),
                               Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(
-                                    'Nearby',
-                                    style: TextStyle(color: NeoColors.muted),
+                                  Expanded(
+                                    child: Text(
+                                      'Up to ${_filters.maxDistance.toStringAsFixed(1)} miles',
+                                      style: const TextStyle(
+                                        color: NeoColors.ink,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
                                   ),
-                                  Text(
-                                    'Up to ${_filters.maxDistance.toStringAsFixed(1)} miles',
-                                    style: const TextStyle(
-                                      color: NeoColors.ink,
-                                      fontWeight: FontWeight.w700,
+                                  const Text(
+                                    'Custom',
+                                    style: TextStyle(
+                                      color: NeoColors.muted,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  SliderValueInput(
+                                    value: _filters.maxDistance,
+                                    min: .5,
+                                    max: 100,
+                                    decimalPlaces: 1,
+                                    suffix: 'mi',
+                                    onChanged: (value) => setState(
+                                      () => _filters = _filters.copyWith(
+                                        maxDistance: value,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -170,17 +187,39 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                   ),
                                 ),
                               ),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: Text(
-                                  _filters.maxBudget == 0
-                                      ? 'Free only'
-                                      : 'Up to \$${_filters.maxBudget} per person',
-                                  style: const TextStyle(
-                                    color: NeoColors.ink,
-                                    fontWeight: FontWeight.w700,
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      _filters.maxBudget == 0
+                                          ? 'Free only'
+                                          : 'Up to \$${_filters.maxBudget} per person',
+                                      style: const TextStyle(
+                                        color: NeoColors.ink,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                  const Text(
+                                    'Custom',
+                                    style: TextStyle(
+                                      color: NeoColors.muted,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  SliderValueInput(
+                                    value: _filters.maxBudget.toDouble(),
+                                    min: 0,
+                                    max: 100,
+                                    prefix: '\$',
+                                    onChanged: (value) => setState(
+                                      () => _filters = _filters.copyWith(
+                                        maxBudget: value.round(),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -196,7 +235,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                           icon: Icons.group_outlined,
                           child: Wrap(
                             spacing: 8,
-                            children: [1, 2, 4, 8]
+                            children: [1, 2, 3, 4, 5, 6, 8]
                                 .map(
                                   (size) => ChoiceChip(
                                     label: Text(size == 8 ? '8+' : '$size'),
@@ -261,17 +300,40 @@ class _FiltersScreenState extends State<FiltersScreen> {
                                   ),
                                 ),
                               ),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: Text(
-                                  _filters.minRating == 0
-                                      ? 'Any rating'
-                                      : '${_filters.minRating.toStringAsFixed(1)} stars and up',
-                                  style: const TextStyle(
-                                    color: NeoColors.ink,
-                                    fontWeight: FontWeight.w700,
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      _filters.minRating == 0
+                                          ? 'Any rating'
+                                          : '${_filters.minRating.toStringAsFixed(1)} stars and up',
+                                      style: const TextStyle(
+                                        color: NeoColors.ink,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                  const Text(
+                                    'Custom',
+                                    style: TextStyle(
+                                      color: NeoColors.muted,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  SliderValueInput(
+                                    value: _filters.minRating,
+                                    min: 0,
+                                    max: 5,
+                                    decimalPlaces: 1,
+                                    suffix: '★',
+                                    onChanged: (value) => setState(
+                                      () => _filters = _filters.copyWith(
+                                        minRating: value,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),

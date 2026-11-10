@@ -88,7 +88,7 @@ class _LandingHeader extends StatelessWidget {
               const SizedBox(width: 10),
             ],
             FilledButton(
-              onPressed: () => Navigator.pushNamed(context, '/signup'),
+              onPressed: () => Navigator.pushNamed(context, '/list'),
               style: FilledButton.styleFrom(
                 backgroundColor: NeoColors.lime,
                 foregroundColor: const Color(0xFF121910),
@@ -98,7 +98,7 @@ class _LandingHeader extends StatelessWidget {
                 ),
               ),
               child: const Text(
-                'Get started',
+                'Explore quests',
                 style: TextStyle(fontWeight: FontWeight.w800),
               ),
             ),
@@ -171,9 +171,9 @@ class _Hero extends StatelessWidget {
                   runSpacing: 12,
                   children: [
                     FilledButton.icon(
-                      onPressed: () => Navigator.pushNamed(context, '/signup'),
+                      onPressed: () => Navigator.pushNamed(context, '/list'),
                       icon: const Icon(Icons.arrow_outward_rounded, size: 17),
-                      label: const Text('Find your next quest'),
+                      label: const Text('Browse side quests'),
                       style: FilledButton.styleFrom(
                         backgroundColor: NeoColors.lime,
                         foregroundColor: const Color(0xFF121910),
@@ -520,7 +520,7 @@ class _ExploreSection extends StatelessWidget {
             ),
             const SizedBox(height: 30),
             FilledButton(
-              onPressed: () => Navigator.pushNamed(context, '/signup'),
+              onPressed: () => Navigator.pushNamed(context, '/list'),
               style: FilledButton.styleFrom(
                 backgroundColor: NeoColors.lime,
                 foregroundColor: const Color(0xFF121910),

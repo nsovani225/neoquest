@@ -33,7 +33,18 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted) setState(() => _saved = ids);
   }
 
+  Future<void> _openActivity(String id) async {
+    await Navigator.pushNamed(context, '/activity/$id');
+    if (mounted) {
+      setState(() => _activities = widget.api.listActivities());
+    }
+  }
+
   Future<void> _toggleSaved(String id) async {
+    if (FirebaseAuth.instance.currentUser == null) {
+      Navigator.pushNamed(context, '/signin?returnTo=/home');
+      return;
+    }
     try {
       await widget.api.toggleSaved(id);
       await _loadSaved();
@@ -138,10 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           activity: items[i],
                           isSaved: _saved.contains(items[i].id),
                           onSave: () => _toggleSaved(items[i].id),
-                          onTap: () => Navigator.pushNamed(
-                            context,
-                            '/activity/${items[i].id}',
-                          ),
+                          onTap: () => _openActivity(items[i].id),
                         ),
                       );
                     },

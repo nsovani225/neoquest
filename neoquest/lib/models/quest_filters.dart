@@ -31,7 +31,9 @@ class QuestFilters {
 
   factory QuestFilters.fromQuery(Map<String, String> query) => QuestFilters(
     category: query['category'] ?? 'All',
-    maxDistance: double.tryParse(query['distance'] ?? '') ?? 10,
+    maxDistance: (double.tryParse(query['distance'] ?? '') ?? 10)
+        .clamp(0.5, 100)
+        .toDouble(),
     maxBudget: int.tryParse(query['budget'] ?? '') ?? 60,
     groupSize: int.tryParse(query['group'] ?? '') ?? 2,
     maxDurationMinutes: int.tryParse(query['duration'] ?? '') ?? 240,

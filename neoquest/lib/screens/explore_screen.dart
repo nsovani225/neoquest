@@ -65,12 +65,21 @@ class _ExploreScreenState extends State<ExploreScreen> {
     });
   }
 
+  Future<void> _openActivity(String id) async {
+    await Navigator.pushNamed(context, '/activity/$id');
+    if (mounted) _refresh();
+  }
+
   Future<void> _loadSaved() async {
     final ids = await widget.api.savedIds();
     if (mounted) setState(() => _saved = ids);
   }
 
   Future<void> _toggleSaved(String id) async {
+    if (FirebaseAuth.instance.currentUser == null) {
+      Navigator.pushNamed(context, '/signin?returnTo=/list');
+      return;
+    }
     try {
       await widget.api.toggleSaved(id);
       await _loadSaved();
@@ -87,6 +96,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
   }
 
   Future<void> _createQuest() async {
+    if (FirebaseAuth.instance.currentUser == null) {
+      Navigator.pushNamed(context, '/signin?returnTo=/list');
+      return;
+    }
     final activity = await showDialog<Activity>(
       context: context,
       builder: (_) => const _CreateQuestDialog(),
@@ -239,8 +252,16 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         ),
                         const SizedBox(width: 9),
                         OutlinedButton.icon(
-                          onPressed: () =>
-                              setState(() => _onlySaved = !_onlySaved),
+                          onPressed: () {
+                            if (FirebaseAuth.instance.currentUser == null) {
+                              Navigator.pushNamed(
+                                context,
+                                '/signin?returnTo=/list',
+                              );
+                              return;
+                            }
+                            setState(() => _onlySaved = !_onlySaved);
+                          },
                           icon: Icon(
                             _onlySaved
                                 ? Icons.favorite_rounded
@@ -389,10 +410,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                             activity: item,
                             isSaved: _saved.contains(item.id),
                             onSave: () => _toggleSaved(item.id),
-                            onTap: () => Navigator.pushNamed(
-                              context,
-                              '/activity/${item.id}',
-                            ),
+                            onTap: () => _openActivity(item.id),
                           );
                         },
                       );

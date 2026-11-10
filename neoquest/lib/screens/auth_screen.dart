@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../data/activity_api.dart';
@@ -51,14 +52,8 @@ class _AuthScreenState extends State<AuthScreen> {
           password: _password.text,
         );
       }
-      await FirestoreActivityApi().seedMissingSamples();
-      if (mounted) {
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          widget.returnTo,
-          (_) => false,
-        );
-      }
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) await _finishSignIn(user);
     } on FirebaseAuthException catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -73,15 +68,11 @@ class _AuthScreenState extends State<AuthScreen> {
   Future<void> _googleSignIn() async {
     setState(() => _busy = true);
     try {
-      await FirebaseAuth.instance.signInWithPopup(GoogleAuthProvider());
-      await FirestoreActivityApi().seedMissingSamples();
-      if (mounted) {
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          widget.returnTo,
-          (_) => false,
-        );
-      }
+      final credential = await FirebaseAuth.instance.signInWithPopup(
+        GoogleAuthProvider(),
+      );
+      final user = credential.user;
+      if (user != null) await _finishSignIn(user);
     } on FirebaseAuthException catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -91,6 +82,29 @@ class _AuthScreenState extends State<AuthScreen> {
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  Future<void> _finishSignIn(User user) async {
+    await FirestoreActivityApi().seedMissingSamples();
+    var needsSetup = true;
+    try {
+      final profile = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid);
+      final values = <String, dynamic>{'email': user.email ?? ''};
+      final displayName = user.displayName?.trim();
+      if (displayName != null && displayName.isNotEmpty) {
+        values['name'] = displayName;
+      }
+      await profile.set(values, SetOptions(merge: true));
+      final snapshot = await profile.get();
+      needsSetup = snapshot.data()?['profileSetupComplete'] != true;
+    } on FirebaseException {
+      // Keep sign-in usable if the profile document cannot be reached yet.
+    }
+    if (!mounted) return;
+    final destination = needsSetup ? '/profile?setup=1' : widget.returnTo;
+    Navigator.pushNamedAndRemoveUntil(context, destination, (_) => false);
   }
 
   Future<void> _resetPassword() async {
