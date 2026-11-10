@@ -115,10 +115,10 @@ class _FiltersScreenState extends State<FiltersScreen> {
                           child: Column(
                             children: [
                               Slider(
-                                value: _filters.maxDistance.clamp(0.5, 10),
+                                value: _filters.maxDistance.clamp(0.5, 100),
                                 min: .5,
-                                max: 10,
-                                divisions: 19,
+                                max: 100,
+                                divisions: 199,
                                 label:
                                     '${_filters.maxDistance.toStringAsFixed(1)} mi',
                                 onChanged: (value) => setState(
@@ -196,7 +196,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                           icon: Icons.group_outlined,
                           child: Wrap(
                             spacing: 8,
-                            children: [1, 2, 4, 8]
+                            children: [1, 2, 3, 4, 5, 6, 8]
                                 .map(
                                   (size) => ChoiceChip(
                                     label: Text(size == 8 ? '8+' : '$size'),

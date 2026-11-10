@@ -884,10 +884,10 @@ class _PreferencesPanelState extends State<_PreferencesPanel> {
         Column(
           children: [
             Slider(
-              value: _filters.maxDistance.clamp(.5, 10),
+              value: _filters.maxDistance.clamp(.5, 100),
               min: .5,
-              max: 10,
-              divisions: 19,
+              max: 100,
+              divisions: 199,
               label: '${_filters.maxDistance.toStringAsFixed(1)} mi',
               onChanged: (value) =>
                   _update(_filters.copyWith(maxDistance: value)),
@@ -932,7 +932,7 @@ class _PreferencesPanelState extends State<_PreferencesPanel> {
         'Who’s coming?',
         Icons.group_outlined,
         _choiceChips(
-          ['1', '2', '4', '6', '8'],
+          ['1', '2', '3', '4', '5', '6', '8'],
           '${_filters.groupSize}',
           (value) => _update(_filters.copyWith(groupSize: int.parse(value))),
         ),
