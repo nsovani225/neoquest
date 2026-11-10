@@ -5,6 +5,8 @@ import '../data/activity_api.dart';
 import '../models/activity.dart';
 import '../theme.dart';
 import '../widgets/activity_icon.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 class ActivityDetailScreen extends StatefulWidget {
   const ActivityDetailScreen({
@@ -314,15 +316,48 @@ class _ActivityDetailScreenState extends State<ActivityDetailScreen> {
                           ],
                         ),
                       );
-                      return wide
-                          ? Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(flex: 11, child: art),
-                                Expanded(flex: 10, child: info),
-                              ],
-                            )
-                          : Column(children: [art, info]);
+                      
+final mapSection = Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    const SizedBox(height: 28),
+    const Text(
+      'Where to find it',
+      style: TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.w800,
+        color: NeoColors.ink,
+      ),
+    ),
+    const SizedBox(height: 8),
+    Text(
+      activity.location,
+      style: const TextStyle(
+        color: NeoColors.muted,
+        fontSize: 14,
+      ),
+    ),
+    const SizedBox(height: 16),
+    _SideQuestMap(activity: activity),
+  ],
+);
+
+return Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    wide
+        ? Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(flex: 11, child: art),
+              Expanded(flex: 10, child: info),
+            ],
+          )
+        : Column(children: [art, info]),
+    mapSection,
+  ],
+);
+
                     },
                   ),
                 ],
@@ -399,4 +434,58 @@ class _DetailPill extends StatelessWidget {
       ),
     ),
   );
+}
+class _SideQuestMap extends StatelessWidget {
+  const _SideQuestMap({required this.activity});
+
+  final Activity activity;
+
+  @override
+  Widget build(BuildContext context) {
+    final position = LatLng(
+      activity.latitude,
+      activity.longitude,
+    );
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: SizedBox(
+        height: 320,
+        child: FlutterMap(
+          options: MapOptions(
+            initialCenter: position,
+            initialZoom: 15,
+          ),
+          children: [
+            TileLayer(
+              urlTemplate:
+                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              userAgentPackageName: 'com.neoquest.web',
+            ),
+            MarkerLayer(
+              markers: [
+                Marker(
+                  point: position,
+                  width: 50,
+                  height: 50,
+                  child: const Icon(
+                    Icons.location_on,
+                    color: NeoColors.violet,
+                    size: 45,
+                  ),
+                ),
+              ],
+            ),
+            const RichAttributionWidget(
+              attributions: [
+                TextSourceAttribution(
+                  'OpenStreetMap contributors',
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
