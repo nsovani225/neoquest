@@ -521,7 +521,7 @@ class _HowItWorks extends StatelessWidget {
               '01',
               Icons.tune_rounded,
               'Pick your vibe',
-              'Choose a mood, a budget, and how far you feel like going.',
+              ' a mood, a budget, and how far you feel like going.',
             ),
             (
               '02',
