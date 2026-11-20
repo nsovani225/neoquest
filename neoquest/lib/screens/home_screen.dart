@@ -158,6 +158,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 67),
               const _HowItWorks(),
+              const SizedBox(height: 67),
+              const _ContactSection(),
             ],
           ),
         ),
@@ -628,4 +630,113 @@ class _LoadMessage extends StatelessWidget {
       ),
     ),
   );
+}
+class _ContactSection extends StatelessWidget {
+  const _ContactSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: NeoColors.line),
+      ),
+      child: LayoutBuilder(
+        builder: (context, box) {
+          final wide = box.maxWidth > 650;
+          final header = const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _Eyebrow('GET IN TOUCH'),
+              SizedBox(height: 10),
+              Text(
+                'Questions, ideas, or feedback?',
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -.7,
+                  color: NeoColors.ink,
+                ),
+              ),
+              SizedBox(height: 6),
+              Text(
+                'Reach out anytime—we would love to hear from you.',
+                style: TextStyle(
+                  color: NeoColors.muted,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          );
+
+          final links = Wrap(
+            spacing: 14,
+            runSpacing: 12,
+            children: const [
+              _ContactChip(
+                icon: Icons.mail_outline_rounded,
+                label: 'hello@neoquest.app', // Replace with your email
+              ),
+              _ContactChip(
+                icon: Icons.camera_alt_outlined,
+                label: '@neoquest.berkeley', // Replace with your Instagram
+              ),
+            ],
+          );
+
+          if (wide) {
+            return Row(
+              children: [
+                Expanded(child: header),
+                const SizedBox(width: 24),
+                links,
+              ],
+            );
+          }
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              header,
+              const SizedBox(height: 20),
+              links,
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _ContactChip extends StatelessWidget {
+  const _ContactChip({required this.icon, required this.label});
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: NeoColors.lilac,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 18, color: NeoColors.violet),
+          const SizedBox(width: 10),
+          SelectableText(
+            label,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: NeoColors.ink,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
