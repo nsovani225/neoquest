@@ -677,11 +677,11 @@ class _ContactSection extends StatelessWidget {
             children: const [
               _ContactChip(
                 icon: Icons.mail_outline_rounded,
-                label: 'hello@neoquest.app', // Replace with your email
+                label: 'support.neoquest@gmail.com', // Replace with your email
               ),
               _ContactChip(
                 icon: Icons.camera_alt_outlined,
-                label: '@neoquest.berkeley', // Replace with your Instagram
+                label: '@neoquest.op', // Replace with your Instagram
               ),
             ],
           );
