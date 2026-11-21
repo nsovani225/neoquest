@@ -2,6 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'data/activity_api.dart';
+import 'data/adventure_packages.dart';
+import 'screens/packages_screen.dart';
+import 'screens/package_detail_screen.dart';
 import 'models/quest_filters.dart';
 import 'screens/activity_detail_screen.dart';
 import 'screens/auth_screen.dart';
@@ -41,10 +44,25 @@ class _NeoQuestAppState extends State<NeoQuestApp> {
     final uri = Uri.tryParse(path) ?? Uri(path: '/');
     final normalized = uri.path.isEmpty ? '/' : uri.path;
     final query = uri.queryParameters;
-    if (normalized == '/profile' && FirebaseAuth.instance.currentUser == null) {
+
+  
+    final protected =
+        normalized == '/home' ||
+        normalized == '/profile' ||
+        normalized == '/filters' ||
+        normalized == '/list' ||
+        normalized == '/explore' ||
+        normalized == '/map' ||
+        normalized == '/packages' ||
+        normalized.startsWith('/packages/') ||
+        normalized.startsWith('/activity/');
+
+    if (protected && FirebaseAuth.instance.currentUser == null) {
+      final target = '$normalized${uri.hasQuery ? '?${uri.query}' : ''}';
+
       return AppShell(
         showAuthActions: false,
-        child: const AuthScreen(isSignUp: false, returnTo: '/profile'),
+        child: AuthScreen(isSignUp: false, returnTo: target),
       );
     }
     final filters = QuestFilters.fromQuery(query);
@@ -78,6 +96,34 @@ class _NeoQuestAppState extends State<NeoQuestApp> {
         child: MapScreen(api: api, filters: filters),
       );
     }
+
+if (normalized == '/packages') {
+  return AppShell(
+    child: const PackagesScreen(),
+  );
+}
+if (normalized.startsWith('/packages/')) {
+  final id = Uri.decodeComponent(
+    normalized.substring('/packages/'.length),
+  );
+
+  for (final package in adventurePackages) {
+    if (package.id == id) {
+      return AppShell(
+        child: PackageDetailScreen(
+          api: api,
+          package: package,
+        ),
+      );
+    }
+  }
+
+  return AppShell(
+    child: Center(
+      child: Text('Adventure package not found.'),
+    ),
+  );
+}
     if (normalized.startsWith('/activity/')) {
       final id = Uri.decodeComponent(normalized.substring('/activity/'.length));
       return AppShell(
