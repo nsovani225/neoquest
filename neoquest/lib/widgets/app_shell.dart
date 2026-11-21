@@ -94,7 +94,7 @@ class _TopBar extends StatelessWidget {
               
 
                 // Navigation links for signed-in users
-                if (signedIn &&
+                if (
                     MediaQuery.sizeOf(context).width > 590) ...[
 
                   _NavLink(

@@ -46,23 +46,14 @@ class _NeoQuestAppState extends State<NeoQuestApp> {
     final query = uri.queryParameters;
 
   
-    final protected =
-        normalized == '/home' ||
-        normalized == '/profile' ||
-        normalized == '/filters' ||
-        normalized == '/list' ||
-        normalized == '/explore' ||
-        normalized == '/map' ||
-        normalized == '/packages' ||
-        normalized.startsWith('/packages/') ||
-        normalized.startsWith('/activity/');
-
-    if (protected && FirebaseAuth.instance.currentUser == null) {
-      final target = '$normalized${uri.hasQuery ? '?${uri.query}' : ''}';
-
+    if (normalized == '/profile' &&
+        FirebaseAuth.instance.currentUser == null) {
       return AppShell(
         showAuthActions: false,
-        child: AuthScreen(isSignUp: false, returnTo: target),
+        child: AuthScreen(
+          isSignUp: false,
+          returnTo: '/profile',
+        ),
       );
     }
     final filters = QuestFilters.fromQuery(query);
