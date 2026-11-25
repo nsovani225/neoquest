@@ -659,11 +659,12 @@ class _ProfileScreenState extends State<ProfileScreen>
                       isScrollable: false,
                       labelColor: NeoColors.ink,
                       unselectedLabelColor: NeoColors.muted,
+                      indicatorSize: TabBarIndicatorSize.tab,
                       indicator: BoxDecoration(
                         color: NeoColors.lime,
                         borderRadius: BorderRadius.circular(13),
                       ),
-                      indicatorPadding: const EdgeInsets.all(4),
+                      indicatorPadding: EdgeInsets.zero,
                       dividerColor: Colors.transparent,
                       tabs: const [
                         Tab(text: 'My quests'),
