@@ -146,6 +146,8 @@ class _TopBar extends StatelessWidget {
                         _signOut(context);
                       } else if (value == 'packages') {
                         Navigator.pushNamed(context, '/packages');
+                      } else if (value == 'build_sidequest') {
+                        Navigator.pushNamed(context, '/sidequests/new');
                       } else {
                         Navigator.pushNamed(context, '/profile');
                       }
@@ -158,6 +160,10 @@ class _TopBar extends StatelessWidget {
                       PopupMenuItem(
                         value: 'packages',
                         child: Text('Adventure Packages'),
+                      ),
+                      PopupMenuItem(
+                        value: 'build_sidequest',
+                        child: Text('Build a side quest'),
                       ),
                       PopupMenuItem(
                         value: 'signout',

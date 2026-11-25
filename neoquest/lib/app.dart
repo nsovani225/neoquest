@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 
 import 'data/activity_api.dart';
 import 'data/adventure_packages.dart';
-import 'screens/packages_screen.dart';
+import 'data/side_quest_api.dart';
 import 'screens/package_detail_screen.dart';
+import 'screens/packages_screen.dart';
 import 'models/quest_filters.dart';
 import 'screens/activity_detail_screen.dart';
 import 'screens/auth_screen.dart';
@@ -13,6 +14,8 @@ import 'screens/filters_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/landing_screen.dart';
 import 'screens/map_screen.dart';
+import 'screens/side_quest_builder_screen.dart';
+import 'screens/side_quest_detail_screen.dart';
 import 'theme.dart';
 import 'widgets/app_shell.dart';
 import 'screens/profile_screen.dart';
@@ -26,6 +29,7 @@ class NeoQuestApp extends StatefulWidget {
 
 class _NeoQuestAppState extends State<NeoQuestApp> {
   late final ActivityApi api = FirestoreActivityApi();
+  late final SideQuestApi sideQuestApi = SideQuestApi();
   late final Future<User?> _session = FirebaseAuth.instance
       .authStateChanges()
       .first;
@@ -45,15 +49,16 @@ class _NeoQuestAppState extends State<NeoQuestApp> {
     final normalized = uri.path.isEmpty ? '/' : uri.path;
     final query = uri.queryParameters;
 
-  
-    if (normalized == '/profile' &&
-        FirebaseAuth.instance.currentUser == null) {
+    final privateSideQuestPath =
+        normalized == '/profile' ||
+        normalized == '/packages' ||
+        normalized.startsWith('/packages/') ||
+        normalized.startsWith('/sidequests/');
+    if (privateSideQuestPath && FirebaseAuth.instance.currentUser == null) {
+      final target = '$normalized${uri.hasQuery ? '?${uri.query}' : ''}';
       return AppShell(
         showAuthActions: false,
-        child: AuthScreen(
-          isSignUp: false,
-          returnTo: '/profile',
-        ),
+        child: AuthScreen(isSignUp: false, returnTo: target),
       );
     }
     final filters = QuestFilters.fromQuery(query);
@@ -88,33 +93,55 @@ class _NeoQuestAppState extends State<NeoQuestApp> {
       );
     }
 
-if (normalized == '/packages') {
-  return AppShell(
-    child: const PackagesScreen(),
-  );
-}
-if (normalized.startsWith('/packages/')) {
-  final id = Uri.decodeComponent(
-    normalized.substring('/packages/'.length),
-  );
+    if (normalized == '/packages') {
+      return AppShell(child: PackagesScreen(sideQuestApi: sideQuestApi));
+    }
+    if (normalized.startsWith('/packages/')) {
+      final id = Uri.decodeComponent(normalized.substring('/packages/'.length));
 
-  for (final package in adventurePackages) {
-    if (package.id == id) {
+      for (final package in adventurePackages) {
+        if (package.id == id) {
+          return AppShell(
+            child: PackageDetailScreen(api: api, package: package),
+          );
+        }
+      }
+
       return AppShell(
-        child: PackageDetailScreen(
-          api: api,
-          package: package,
+        child: const Center(child: Text('Adventure package not found.')),
+      );
+    }
+    if (normalized == '/sidequests/new') {
+      return AppShell(
+        child: SideQuestBuilderScreen(
+          activityApi: api,
+          sideQuestApi: sideQuestApi,
         ),
       );
     }
-  }
-
-  return AppShell(
-    child: Center(
-      child: Text('Adventure package not found.'),
-    ),
-  );
-}
+    if (normalized.startsWith('/sidequests/')) {
+      final segments = normalized
+          .split('/')
+          .where((part) => part.isNotEmpty)
+          .toList();
+      if (segments.length == 3 && segments[2] == 'edit') {
+        return AppShell(
+          child: SideQuestBuilderScreen(
+            activityApi: api,
+            sideQuestApi: sideQuestApi,
+            routeId: Uri.decodeComponent(segments[1]),
+          ),
+        );
+      }
+      if (segments.length == 2) {
+        return AppShell(
+          child: SideQuestDetailScreen(
+            sideQuestApi: sideQuestApi,
+            routeId: Uri.decodeComponent(segments[1]),
+          ),
+        );
+      }
+    }
     if (normalized.startsWith('/activity/')) {
       final id = Uri.decodeComponent(normalized.substring('/activity/'.length));
       return AppShell(

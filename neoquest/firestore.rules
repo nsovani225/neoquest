@@ -35,5 +35,10 @@ service cloud.firestore {
         && request.auth.uid == userId
         && request.resource.data.activityId == activityId;
     }
+
+    match /users/{userId}/sidequests/{sideQuestId} {
+      allow read, create, update, delete: if request.auth != null
+        && request.auth.uid == userId;
+    }
   }
 }

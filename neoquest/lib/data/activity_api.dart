@@ -16,6 +16,8 @@ abstract interface class ActivityApi {
     String query = '',
     String category = 'All',
     QuestFilters filters = const QuestFilters(),
+    bool includeVisited = false,
+    bool applyFilters = true,
   });
   Future<Activity?> getActivity(String id);
   Future<Activity> createActivity(Activity activity);
@@ -232,6 +234,8 @@ class FirestoreActivityApi implements ActivityApi {
     String query = '',
     String category = 'All',
     QuestFilters filters = const QuestFilters(),
+    bool includeVisited = false,
+    bool applyFilters = true,
   }) async {
     List<Activity> records;
     try {
@@ -246,7 +250,7 @@ class FirestoreActivityApi implements ActivityApi {
     }
     final activeCategory = category == 'All' ? filters.category : category;
     final q = query.trim().toLowerCase();
-    final visited = await visitedIds();
+    final visited = includeVisited ? <String>{} : await visitedIds();
     final matching = records.where((item) {
       final categoryMatch =
           activeCategory == 'All' ||
@@ -270,15 +274,16 @@ class FirestoreActivityApi implements ActivityApi {
       final availabilityMatch =
           filters.availability.isEmpty ||
           filters.availability.any(item.availability.contains);
-      return categoryMatch &&
-          queryMatch &&
-          groupMatch &&
-          item.distanceMiles <= filters.maxDistance &&
-          item.budgetAmount <= filters.maxBudget &&
-          item.durationMinutes <= filters.maxDurationMinutes &&
-          item.rating >= filters.minRating &&
-          transportMatch &&
-          availabilityMatch;
+      return queryMatch &&
+          (!applyFilters ||
+              (categoryMatch &&
+                  groupMatch &&
+                  item.distanceMiles <= filters.maxDistance &&
+                  item.budgetAmount <= filters.maxBudget &&
+                  item.durationMinutes <= filters.maxDurationMinutes &&
+                  item.rating >= filters.minRating &&
+                  transportMatch &&
+                  availabilityMatch));
     });
     return filterUnvisitedActivities(matching, visited)
       ..sort((a, b) => a.distanceMiles.compareTo(b.distanceMiles));
